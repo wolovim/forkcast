@@ -7,12 +7,14 @@ import { useAnalytics } from '../../hooks/useAnalytics';
 interface OverviewSectionProps {
   eips: EIP[];
   forkName: string;
+  status: string;
   onStageClick: (stageId: string) => void;
 }
 
 export const OverviewSection: React.FC<OverviewSectionProps> = ({
   eips,
   forkName,
+  status,
   onStageClick
 }) => {
   const { trackLinkClick } = useAnalytics();
@@ -21,7 +23,16 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
     trackLinkClick(linkType, url);
   };
 
+  const isActiveFork = status === 'Active';
+  const declinedCount = eips.filter(eip => getInclusionStage(eip, forkName) === 'Declined for Inclusion').length;
+
   const stageStats = [
+    // Only show "Included" for active forks
+    ...(status === 'Active' ? [{
+      stage: 'Included', 
+      count: eips.filter(eip => getInclusionStage(eip, forkName) === 'Included').length, 
+      color: 'bg-emerald-50 text-emerald-800' 
+    }] : []),
     { 
       stage: 'Proposed for Inclusion', 
       count: eips.filter(eip => getInclusionStage(eip, forkName) === 'Proposed for Inclusion').length, 
@@ -39,7 +50,7 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
     },
     { 
       stage: 'Declined for Inclusion', 
-      count: eips.filter(eip => getInclusionStage(eip, forkName) === 'Declined for Inclusion').length, 
+      count: declinedCount,
       color: 'bg-red-50 text-red-800' 
     }
   ];
@@ -47,13 +58,22 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
   return (
     <div className="bg-white border border-slate-200 rounded p-6" id="overview" data-section>
       <div className="flex items-center gap-3 mb-4">
-        <h2 className="text-lg font-semibold text-slate-900">Upgrade Overview</h2>
+        <h2 className="text-lg font-semibold text-slate-900">
+          {isActiveFork ? 'Upgrade Summary' : 'Upgrade Overview'}
+        </h2>
         <CopyLinkButton 
           sectionId="overview" 
           title="Copy link to overview"
           size="sm"
         />
       </div>
+
+      {/* Add a note for active forks */}
+      {isActiveFork && forkName.toLowerCase() !== 'glamsterdam' && (
+        <div className="mb-4 text-sm text-slate-600">
+          This upgrade is now active on the Ethereum network. Below are the EIPs that were successfully implemented.
+        </div>
+      )}
 
       {/* Special note for Glamsterdam's competitive headliner process */}
       {forkName.toLowerCase() === 'glamsterdam' && (
@@ -127,7 +147,7 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
       
       {/* Stage stats - only show for non-Glamsterdam forks */}
       {forkName.toLowerCase() !== 'glamsterdam' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className={`grid grid-cols-1 md:grid-cols-2 ${status === 'Active' ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-4`}>
           {stageStats.map(({ stage, count, color }) => {
             const stageId = stage.toLowerCase().replace(/\s+/g, '-');
             const hasEips = count > 0;
@@ -145,7 +165,7 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
               >
                 <div className="text-2xl font-light text-slate-900 mb-1">{count}</div>
                 <div className="text-xs text-slate-500 mb-1">EIP{count !== 1 ? 's' : ''}</div>
-                <div className={`text-xs font-medium px-2 py-1 rounded inline-block ${color}`}>
+                <div className={`text-xs font-medium px-2 py-1 rounded inline-block ${color} mb-2`}>
                   {stage}
                 </div>
               </button>

@@ -4,15 +4,76 @@
     "title": "EIP-2537: Precompile for BLS12-381 curve operations",
     "status": "Final",
     "description": "Adds precompiled contracts for BLS12-381 curve operations to enable efficient cryptographic operations.",
-    "author": "Alex Vlasov, et al.",
+    "author": "Alex Vlasov (@shamatar), Kelly Olson (@ineffectualproperty), Alex Stokes (@ralexstokes), Antonio Sanso (@asanso)",
     "type": "Standards Track",
     "category": "Core",
     "createdDate": "2020-02-21",
     "discussionLink": "https://ethereum-magicians.org/t/eip-2537-bls12-381-precompiles/4187",
+    "laymanDescription": "This upgrade adds built-in support for a specific type of cryptography (BLS12-381) that's crucial for Ethereum's security and scalability. It enables more efficient signature verification and aggregation, which is particularly important for validators and Layer 2 solutions. Think of it as adding a hardware accelerator for specific mathematical operations that are frequently used in blockchain applications.",
+    "northStars": [
+      "scaleL1",
+      "improveUX"
+    ],
+    "northStarAlignment": {
+      "scaleL1": {
+        "impact": "High",
+        "description": "Enables efficient signature aggregation which is critical for scaling consensus and reducing the computational load of validating multiple signatures."
+      },
+      "improveUX": {
+        "impact": "Medium",
+        "description": "Allows applications to use advanced cryptographic features without expensive computations, enabling new use cases like privacy-preserving applications."
+      }
+    },
+    "stakeholderImpacts": {
+      "endUsers": {
+        "impact": "Low",
+        "description": "No direct impact on everyday transactions, but enables new privacy-preserving applications and more efficient Layer 2 solutions in the future."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Developers can now build applications using BLS signatures, enabling features like signature aggregation, threshold signatures, and zero-knowledge proofs more efficiently."
+      },
+      "walletDevs": {
+        "impact": "Low",
+        "description": "No immediate changes required, but wallets may eventually support new signature schemes enabled by this precompile."
+      },
+      "toolingInfra": {
+        "impact": "Medium",
+        "description": "Tools need to be updated to recognize and properly handle the new precompile addresses and gas costs."
+      },
+      "layer2s": {
+        "impact": "High",
+        "description": "Layer 2 solutions can leverage BLS signatures for more efficient validator sets and cheaper signature verification."
+      },
+      "stakersNodes": {
+        "impact": "Low",
+        "description": "Node operators need to ensure their clients are updated, but no operational changes are required."
+      },
+      "clClients": {
+        "impact": "Low",
+        "description": "Consensus clients already use BLS12-381; this brings the same capability to the execution layer."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Execution clients must implement the new precompiles with correct gas pricing and computation logic."
+      }
+    },
+    "benefits": [
+      "Enables efficient BLS signature verification on-chain",
+      "Reduces gas costs for cryptographic operations by 10-100x",
+      "Unlocks new use cases like account abstraction and privacy applications",
+      "Improves interoperability with the consensus layer which uses BLS12-381",
+      "Enables signature aggregation for scaling solutions"
+    ],
+    "tradeoffs": [
+      "Increases complexity of the EVM with new precompiles",
+      "Requires careful implementation to avoid security vulnerabilities",
+      "Fixed gas costs may not perfectly match actual computational costs"
+    ],
     "forkRelationships": [
       {
         "forkName": "Pectra",
-        "status": "Scheduled"
+        "status": "Included"
       }
     ]
   },
@@ -21,15 +82,76 @@
     "title": "EIP-2935: Save historical block hashes in state",
     "status": "Final",
     "description": "Saves historical block hashes in state to enable more efficient access to historical data.",
-    "author": "Vitalik Buterin, Tomasz Stanczak",
+    "author": "Vitalik Buterin (@vbuterin), Tomasz Stanczak (@tkstanczak), Guillaume Ballet (@gballet), Gajinder Singh (@g11tech), Tanishq Jasoria (@tanishqjasoria), Ignacio Hagopian (@jsign), Jochem Brouwer (@jochem-brouwer), Sina Mahmoodi (@s1na)",
     "type": "Standards Track",
     "category": "Core",
-    "createdDate": "2020-09-04",
+    "createdDate": "2020-09-03",
     "discussionLink": "https://ethereum-magicians.org/t/eip-2935-save-historical-block-hashes-in-state/4565",
+    "laymanDescription": "Currently, smart contracts can only access the most recent 256 block hashes. This upgrade stores up to 8192 historical block hashes directly in Ethereum's state, making it much easier and cheaper for applications to verify events from the recent past. This is like expanding the blockchain's short-term memory from remembering the last hour to remembering the last day.",
+    "northStars": [
+      "improveUX",
+      "scaleL1"
+    ],
+    "northStarAlignment": {
+      "improveUX": {
+        "impact": "High",
+        "description": "Applications can now verify historical events much further back without complex workarounds, improving reliability and user experience."
+      },
+      "scaleL1": {
+        "impact": "Medium",
+        "description": "Reduces the need for contracts to store historical data themselves, saving state space and gas costs."
+      }
+    },
+    "stakeholderImpacts": {
+      "endUsers": {
+        "impact": "Medium",
+        "description": "Applications become more reliable when verifying past events, reducing failed transactions due to block hash availability."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Developers can now access 8192 historical block hashes instead of just 256, enabling new verification patterns and removing complex workarounds."
+      },
+      "walletDevs": {
+        "impact": "None",
+        "description": "No changes required for wallet implementations."
+      },
+      "toolingInfra": {
+        "impact": "Low",
+        "description": "Block explorers and analytics tools can leverage the extended history for better verification."
+      },
+      "layer2s": {
+        "impact": "High",
+        "description": "Layer 2 solutions can more easily prove historical state transitions and implement longer challenge periods."
+      },
+      "stakersNodes": {
+        "impact": "Low",
+        "description": "Slight increase in state size, but negligible impact on node operation."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No changes required for consensus clients."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Execution clients must implement the new state contract and update the BLOCKHASH opcode behavior."
+      }
+    },
+    "benefits": [
+      "Extends block hash availability from 256 to 8192 blocks",
+      "Enables more robust cross-chain bridges and oracles",
+      "Simplifies smart contract verification of historical events",
+      "Reduces gas costs for applications needing historical verification",
+      "Improves security of time-locked operations"
+    ],
+    "tradeoffs": [
+      "Increases state size by storing additional historical data",
+      "Requires a special system contract that must be maintained",
+      "Still limited to 8192 blocks (approximately 1 day of history)"
+    ],
     "forkRelationships": [
       {
         "forkName": "Pectra",
-        "status": "Scheduled"
+        "status": "Included"
       }
     ]
   },
@@ -55,15 +177,76 @@
     "title": "EIP-6110: Supply validator deposits on chain",
     "status": "Final",
     "description": "Enables validator deposits to be processed directly on the execution layer, improving efficiency.",
-    "author": "Mikhail Kalinin, Danny Ryan, Peter Davies",
+    "author": "Mikhail Kalinin (@mkalinin), Danny Ryan (@djrtwo), Peter Davies (@petertdavies)",
     "type": "Standards Track",
     "category": "Core",
     "createdDate": "2022-12-09",
     "discussionLink": "https://ethereum-magicians.org/t/eip-6110-supply-validator-deposits-on-chain/12072",
+    "laymanDescription": "This upgrade fundamentally changes how new validators join Ethereum's proof-of-stake network. Instead of the current complex process involving Merkle proofs and potential delays, validator deposits are now processed directly through the execution layer. This makes becoming a validator faster, more reliable, and less prone to errors - typically reducing the activation time from hours to minutes.",
+    "northStars": [
+      "improveUX",
+      "scaleL1"
+    ],
+    "northStarAlignment": {
+      "improveUX": {
+        "impact": "High",
+        "description": "Dramatically simplifies the validator onboarding process, reducing complexity and potential for user errors when staking."
+      },
+      "scaleL1": {
+        "impact": "Medium",
+        "description": "Removes the deposit contract bottleneck, allowing for more efficient processing of validator deposits and better scalability."
+      }
+    },
+    "stakeholderImpacts": {
+      "endUsers": {
+        "impact": "Low",
+        "description": "No direct impact on regular users, but improves the overall security and decentralization of the network."
+      },
+      "appDevs": {
+        "impact": "Low",
+        "description": "Staking applications can be simplified as they no longer need to handle complex Merkle proof generation."
+      },
+      "walletDevs": {
+        "impact": "Medium",
+        "description": "Wallets offering staking features can provide a much smoother user experience with faster confirmation times."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "Staking infrastructure providers must update their systems to use the new deposit mechanism."
+      },
+      "layer2s": {
+        "impact": "None",
+        "description": "No direct impact on Layer 2 solutions."
+      },
+      "stakersNodes": {
+        "impact": "High",
+        "description": "New validators experience much faster activation times and more reliable deposit processing."
+      },
+      "clClients": {
+        "impact": "High",
+        "description": "Consensus clients must implement new logic to process deposits from the execution layer."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Execution clients must implement the new deposit processing mechanism and request types."
+      }
+    },
+    "benefits": [
+      "Reduces validator activation time from hours to minutes",
+      "Eliminates complex Merkle proof generation and verification",
+      "Prevents deposit front-running and MEV extraction",
+      "Improves reliability of the staking process",
+      "Enables future improvements to the staking mechanism"
+    ],
+    "tradeoffs": [
+      "Increases complexity of the execution-consensus layer interface",
+      "Requires coordination between both layers for deposit processing",
+      "Changes the trust model for deposit processing"
+    ],
     "forkRelationships": [
       {
         "forkName": "Pectra",
-        "status": "Scheduled"
+        "status": "Included"
       }
     ]
   },
@@ -72,15 +255,71 @@
     "title": "EIP-7002: Execution layer triggerable exits",
     "status": "Final",
     "description": "Allows validator exits to be triggered from the execution layer, improving validator management.",
-    "author": "Danny Ryan, Mikhail Kalinin",
+    "author": "Danny Ryan (@djrtwo), Mikhail Kalinin (@mkalinin), Ansgar Dietrichs (@adietrichs), Hsiao-Wei Wang (@hwwhww), lightclient (@lightclient), Felix Lange (@fjl)",
     "type": "Standards Track",
     "category": "Core",
     "createdDate": "2023-05-09",
     "discussionLink": "https://ethereum-magicians.org/t/eip-7002-execution-layer-triggerable-exits/14195",
+    "laymanDescription": "This upgrade allows validators to exit (unstake) from Ethereum using their withdrawal credentials, without needing access to their validator keys. This is a major security improvement - it's like being able to close your bank account using your ATM card instead of having to go to the branch with your original account opening documents. It particularly helps institutional stakers and those using hardware wallets.",
+    "northStars": [
+      "improveUX"
+    ],
+    "northStarAlignment": {
+      "improveUX": {
+        "impact": "High",
+        "description": "Significantly improves the validator experience by allowing exits without validator key access, reducing operational complexity and security risks."
+      }
+    },
+    "stakeholderImpacts": {
+      "endUsers": {
+        "impact": "None",
+        "description": "No direct impact on regular Ethereum users."
+      },
+      "appDevs": {
+        "impact": "Medium",
+        "description": "Staking applications can now offer exit functionality without requiring validator keys, improving security."
+      },
+      "walletDevs": {
+        "impact": "High",
+        "description": "Wallets can now trigger validator exits using only withdrawal credentials, enabling better staking integration."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "Staking infrastructure must be updated to support the new exit mechanism."
+      },
+      "layer2s": {
+        "impact": "None",
+        "description": "No impact on Layer 2 solutions."
+      },
+      "stakersNodes": {
+        "impact": "High",
+        "description": "Validators gain much more flexibility in managing their stakes, with improved security and reduced key management burden."
+      },
+      "clClients": {
+        "impact": "High",
+        "description": "Consensus clients must process exit requests from the execution layer."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Execution clients must implement the exit request mechanism."
+      }
+    },
+    "benefits": [
+      "Enables validator exits without access to validator signing keys",
+      "Improves security by reducing validator key usage",
+      "Allows for better key separation and cold storage practices",
+      "Enables smart contract triggered exits for liquid staking",
+      "Reduces operational complexity for institutional stakers"
+    ],
+    "tradeoffs": [
+      "Adds complexity to the execution-consensus layer interface",
+      "Exit queue mechanisms become more complex",
+      "Potential for accidental exits if withdrawal credentials are compromised"
+    ],
     "forkRelationships": [
       {
         "forkName": "Pectra",
-        "status": "Scheduled"
+        "status": "Included"
       }
     ]
   },
@@ -89,15 +328,74 @@
     "title": "EIP-7251: Increase the MAX_EFFECTIVE_BALANCE",
     "status": "Final",
     "description": "Increases the maximum effective balance for validators to improve staking efficiency.",
-    "author": "mike, Francesco, dapplion, Mikhail, Aditya, casparschwa, Potuz, Hsiao-Wei",
+    "author": "mike (@michaelneuder), Francesco (@fradamt), dapplion (@dapplion), Mikhail (@mkalinin), Aditya (@adiasg), Justin (@justindrake), lightclient (@lightclient), Felix Lange (@fjl)",
     "type": "Standards Track",
     "category": "Core",
     "createdDate": "2023-06-28",
-    "discussionLink": "https://ethereum-magicians.org/t/eip-7251-increase-the-max-effective-balance/14955",
+    "discussionLink": "https://ethereum-magicians.org/t/eip-7251-increase-the-max-effective-balance/15982",
+    "laymanDescription": "This upgrade allows validators to stake up to 2048 ETH instead of being limited to 32 ETH per validator. Large stakers who previously needed to run hundreds of validators can now consolidate them into fewer, more efficient validators. This is like allowing trucks to carry more cargo - instead of needing 64 small trucks, you can use one large truck, reducing traffic and operational overhead.",
+    "northStars": [
+      "scaleL1",
+      "improveUX"
+    ],
+    "northStarAlignment": {
+      "scaleL1": {
+        "impact": "High",
+        "description": "Dramatically reduces the validator set size for large stakers, improving network efficiency and reducing computational overhead."
+      },
+      "improveUX": {
+        "impact": "High",
+        "description": "Simplifies operations for large stakers and reduces the infrastructure costs of running multiple validators."
+      }
+    },
+    "stakeholderImpacts": {
+      "endUsers": {
+        "impact": "Low",
+        "description": "Indirect benefits through improved network efficiency and potentially lower staking service costs."
+      },
+      "appDevs": {
+        "impact": "Low",
+        "description": "Staking applications may need updates to handle larger validator balances."
+      },
+      "walletDevs": {
+        "impact": "Low",
+        "description": "Minor updates to display larger validator balances correctly."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "Staking infrastructure must be updated to handle validator consolidation and larger balances."
+      },
+      "layer2s": {
+        "impact": "None",
+        "description": "No direct impact on Layer 2 solutions."
+      },
+      "stakersNodes": {
+        "impact": "High",
+        "description": "Large stakers can dramatically reduce operational overhead by consolidating validators, while solo stakers are unaffected."
+      },
+      "clClients": {
+        "impact": "High",
+        "description": "Consensus clients must update balance calculations and validator logic for the new maximum."
+      },
+      "elClients": {
+        "impact": "Low",
+        "description": "Minimal changes required for execution clients."
+      }
+    },
+    "benefits": [
+      "Enables validator consolidation, reducing the active validator set size",
+      "Improves network scalability by reducing message complexity",
+      "Allows for auto-compounding of staking rewards in 1 ETH increments",
+      "Reduces the initial slashing penalty from 1 ETH per 32 ETH to 0.0078125 ETH, scaling linearly to 0.5 for 2048 ETH",
+      "Reduces the operational burden of managing large amounts of stake"
+    ],
+    "tradeoffs": [
+      "Potentially increases the amount of stake put into a slashed state in a single slashing incident"
+    ],
     "forkRelationships": [
       {
         "forkName": "Pectra",
-        "status": "Scheduled"
+        "status": "Included"
       }
     ]
   },
@@ -106,15 +404,71 @@
     "title": "EIP-7549: Move committee index outside Attestation",
     "status": "Final",
     "description": "Moves the committee index outside of attestations to improve consensus layer efficiency.",
-    "author": "dapplion",
+    "author": "dapplion (@dapplion), Mikhail Kalinin (@mkalinin)",
     "type": "Standards Track",
     "category": "Core",
-    "createdDate": "2023-11-09",
-    "discussionLink": "https://ethereum-magicians.org/t/eip-7549-move-committee-index-outside-attestation/15710",
+    "createdDate": "2023-11-01",
+    "discussionLink": "https://ethereum-magicians.org/t/eip-7549-move-committee-index-outside-attestation/16390",
+    "laymanDescription": "This technical improvement reorganizes how validator votes (attestations) are structured, making it much more efficient to combine them. It's like reorganizing a filing system - the same information is stored, but in a way that makes it faster to process. This reduces the network bandwidth needed for consensus by allowing better compression of validator messages.",
+    "northStars": [
+      "scaleL1"
+    ],
+    "northStarAlignment": {
+      "scaleL1": {
+        "impact": "High",
+        "description": "Enables more efficient attestation aggregation, reducing bandwidth requirements and improving consensus scalability."
+      }
+    },
+    "stakeholderImpacts": {
+      "endUsers": {
+        "impact": "None",
+        "description": "No direct impact on end users."
+      },
+      "appDevs": {
+        "impact": "None",
+        "description": "No impact on application developers."
+      },
+      "walletDevs": {
+        "impact": "None",
+        "description": "No changes required for wallets."
+      },
+      "toolingInfra": {
+        "impact": "Low",
+        "description": "Tools analyzing attestations need minor updates for the new format."
+      },
+      "layer2s": {
+        "impact": "None",
+        "description": "No impact on Layer 2 solutions."
+      },
+      "stakersNodes": {
+        "impact": "Medium",
+        "description": "Validators benefit from reduced bandwidth usage and more efficient attestation aggregation."
+      },
+      "clClients": {
+        "impact": "High",
+        "description": "Consensus clients must update attestation handling and aggregation logic."
+      },
+      "elClients": {
+        "impact": "None",
+        "description": "No changes required for execution clients."
+      }
+    },
+    "benefits": [
+      "Enables more efficient attestation aggregation",
+      "Reduces bandwidth requirements for consensus",
+      "Improves the scalability of the beacon chain",
+      "Allows for better compression of attestation data",
+      "Prepares for future consensus improvements"
+    ],
+    "tradeoffs": [
+      "Requires changes to attestation data structures",
+      "Breaking change for consensus layer protocols",
+      "Increases complexity of attestation handling"
+    ],
     "forkRelationships": [
       {
         "forkName": "Pectra",
-        "status": "Scheduled"
+        "status": "Included"
       }
     ]
   },
@@ -136,20 +490,53 @@
       }
     ],
     "laymanDescription": "PeerDAS enables Ethereum nodes to specialize in storing different pieces of data while still verifying everything is available. This foundational change dramatically increases data capacity for Layer 2 networks while maintaining security.",
-    "northStars": ["Scale L1", "Scale blobs"],
+    "northStars": [
+      "scaleL1",
+      "scaleBlobs"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "High", "description": "Essential foundation for scaling Ethereum's data capacity. Builds the infrastructure needed for full Danksharding, potentially increasing data throughput from ~375KB/s to several MB/s in future upgrades." },
-      "scaleBlobs": { "impact": "High", "description": "Directly enables Layer 2 scaling by allowing nodes to efficiently handle much more data without overwhelming individual participants." }
+      "scaleL1": {
+        "impact": "High",
+        "description": "Essential foundation for scaling Ethereum's data capacity. Builds the infrastructure needed for full Danksharding, potentially increasing data throughput from ~375KB/s to several MB/s in future upgrades."
+      },
+      "scaleBlobs": {
+        "impact": "High",
+        "description": "Directly enables Layer 2 scaling by allowing nodes to efficiently handle much more data without overwhelming individual participants."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Medium", "description": "Benefits through much cheaper Layer 2 transactions and access to applications that need more data throughput." },
-      "appDevs": { "impact": "Medium", "description": "Enables building applications with higher data requirements. Layer 2 developers benefit from reduced costs and higher capacity limits." },
-      "walletDevs": { "impact": "Low", "description": "Minimal direct impact. Users benefit indirectly through better Layer 2 transaction reliability and lower costs." },
-      "toolingInfra": { "impact": "High", "description": "Major updates needed for block explorers, indexers, and data availability APIs to handle the new sampling system and proof formats." },
-      "layer2s": { "impact": "High", "description": "Game-changing for Layer 2 economics - dramatically reduces costs for posting transaction data and enables much higher throughput rollups." },
-      "stakersNodes": { "impact": "High", "description": "Must implement the new specialized data storage and sampling system. Changes from downloading everything to participating in a coordinated verification network." },
-      "clClients": { "impact": "High", "description": "Major implementation work required for the new data distribution system, sampling protocols, and coordination between nodes. This is a core infrastructure change." },
-      "elClients": { "impact": "Medium", "description": "Need to update how blob transactions are handled and verified, including new proof formats and validation methods." }
+      "endUsers": {
+        "impact": "Medium",
+        "description": "Benefits through much cheaper Layer 2 transactions and access to applications that need more data throughput."
+      },
+      "appDevs": {
+        "impact": "Medium",
+        "description": "Enables building applications with higher data requirements. Layer 2 developers benefit from reduced costs and higher capacity limits."
+      },
+      "walletDevs": {
+        "impact": "Low",
+        "description": "Minimal direct impact. Users benefit indirectly through better Layer 2 transaction reliability and lower costs."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "Major updates needed for block explorers, indexers, and data availability APIs to handle the new sampling system and proof formats."
+      },
+      "layer2s": {
+        "impact": "High",
+        "description": "Game-changing for Layer 2 economics - dramatically reduces costs for posting transaction data and enables much higher throughput rollups."
+      },
+      "stakersNodes": {
+        "impact": "High",
+        "description": "Must implement the new specialized data storage and sampling system. Changes from downloading everything to participating in a coordinated verification network."
+      },
+      "clClients": {
+        "impact": "High",
+        "description": "Major implementation work required for the new data distribution system, sampling protocols, and coordination between nodes. This is a core infrastructure change."
+      },
+      "elClients": {
+        "impact": "Medium",
+        "description": "Need to update how blob transactions are handled and verified, including new proof formats and validation methods."
+      }
     },
     "benefits": [
       "Dramatically reduces Layer 2 transaction costs",
@@ -162,13 +549,13 @@
   {
     "id": 7600,
     "title": "EIP-7600: Hardfork Meta - Pectra",
-    "status": "Last Call",
+    "status": "Final",
     "description": "Meta EIP listing the EIPs formally Scheduled for Inclusion in the Prague/Electra network upgrade.",
     "author": "Tim Beiko",
     "type": "Meta",
     "category": "Core",
     "createdDate": "2024-01-18",
-    "discussionLink": "https://ethereum-magicians.org/t/eip-7600-pectra-meta-eip/18400",
+    "discussionLink": "https://ethereum-magicians.org/t/eip-7600-hardfork-meta-prague-electra/18205",
     "forkRelationships": [
       {
         "forkName": "Pectra",
@@ -198,15 +585,71 @@
     "title": "EIP-7623: Increase calldata cost",
     "status": "Final",
     "description": "Increases the gas cost of calldata to better reflect its resource usage and improve network efficiency.",
-    "author": "Toni Wahrstätter, Vitalik Buterin",
+    "author": "Toni Wahrstätter (@nerolation), Vitalik Buterin (@vbuterin)",
     "type": "Standards Track",
     "category": "Core",
     "createdDate": "2024-02-13",
     "discussionLink": "https://ethereum-magicians.org/t/eip-7623-increase-calldata-cost/18647",
+    "laymanDescription": "This upgrade increases the gas cost for transaction data (calldata) to prevent blocks from becoming too large. It's like adding a weight limit to packages - by making heavy data more expensive, we ensure the network doesn't get congested with oversized blocks. This particularly affects data-heavy transactions while having minimal impact on regular transfers and smart contract interactions.",
+    "northStars": [
+      "scaleL1"
+    ],
+    "northStarAlignment": {
+      "scaleL1": {
+        "impact": "High",
+        "description": "Prevents block size explosion, ensuring consistent block propagation times and network stability as usage grows."
+      }
+    },
+    "stakeholderImpacts": {
+      "endUsers": {
+        "impact": "Low",
+        "description": "Most users see minimal impact; only those making data-heavy transactions pay more."
+      },
+      "appDevs": {
+        "impact": "Medium",
+        "description": "Applications using large amounts of calldata need optimization or may face higher costs."
+      },
+      "walletDevs": {
+        "impact": "Low",
+        "description": "Gas estimation updates needed but no functional changes."
+      },
+      "toolingInfra": {
+        "impact": "Medium",
+        "description": "Gas estimation tools and block builders need updates for new pricing."
+      },
+      "layer2s": {
+        "impact": "High",
+        "description": "Rollups posting data to L1 face higher costs, incentivizing migration to blob transactions."
+      },
+      "stakersNodes": {
+        "impact": "Medium",
+        "description": "More consistent block sizes improve node operation and reduce bandwidth spikes."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No changes required for consensus clients."
+      },
+      "elClients": {
+        "impact": "Medium",
+        "description": "Execution clients must implement new gas calculation logic."
+      }
+    },
+    "benefits": [
+      "Prevents block size explosion and network congestion",
+      "Ensures more predictable block propagation times",
+      "Incentivizes efficient data usage",
+      "Improves network stability under high load",
+      "Encourages rollups to use blob transactions"
+    ],
+    "tradeoffs": [
+      "Increases costs for data-heavy operations",
+      "May impact certain use cases like on-chain data storage",
+      "Rollups face higher costs until they migrate to blobs"
+    ],
     "forkRelationships": [
       {
         "forkName": "Pectra",
-        "status": "Scheduled"
+        "status": "Included"
       }
     ]
   },
@@ -223,7 +666,7 @@
     "forkRelationships": [
       {
         "forkName": "Pectra",
-        "status": "Scheduled"
+        "status": "Included"
       },
       {
         "forkName": "Fusaka",
@@ -231,19 +674,48 @@
       }
     ],
     "laymanDescription": "This networking upgrade removes outdated data from node synchronization, saving approximately 530GB of bandwidth per sync. It also prepares for removing old blockchain history from new nodes starting in May 2025.",
-    "northStars": ["Scale L1"],
+    "northStars": [
+      "scaleL1"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "Medium", "description": "Significant bandwidth reduction (530GB+ per sync) and improved networking efficiency through bloom filter removal and better historical data coordination." }
+      "scaleL1": {
+        "impact": "Medium",
+        "description": "Significant bandwidth reduction (530GB+ per sync) and improved networking efficiency through bloom filter removal and better historical data coordination."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Low", "description": "Indirect benefits through faster node sync times and reduced bandwidth usage during initial sync." },
-      "appDevs": { "impact": "None", "description": "No impact on smart contract development or execution environment." },
-      "walletDevs": { "impact": "Low", "description": "Faster initial sync times when setting up new nodes, better reliability for historical data requests." },
-      "toolingInfra": { "impact": "Medium", "description": "Historical data APIs and indexers need updates for new history serving windows and modified networking protocols." },
-      "layer2s": { "impact": "Low", "description": "More efficient networking infrastructure provides a better foundation for Layer 2 operations." },
-      "stakersNodes": { "impact": "Medium", "description": "Significant bandwidth savings during sync operations. Nodes serving historical data gain better tools for announcing their capabilities." },
-      "clClients": { "impact": "Low", "description": "Minimal impact as this primarily affects execution layer networking protocols." },
-      "elClients": { "impact": "High", "description": "Major implementation work required for new eth/69 protocol including history serving windows, bloom filter removal from receipts, and BlockRangeUpdate messaging." }
+      "endUsers": {
+        "impact": "Low",
+        "description": "Indirect benefits through faster node sync times and reduced bandwidth usage during initial sync."
+      },
+      "appDevs": {
+        "impact": "None",
+        "description": "No impact on smart contract development or execution environment."
+      },
+      "walletDevs": {
+        "impact": "Low",
+        "description": "Faster initial sync times when setting up new nodes, better reliability for historical data requests."
+      },
+      "toolingInfra": {
+        "impact": "Medium",
+        "description": "Historical data APIs and indexers need updates for new history serving windows and modified networking protocols."
+      },
+      "layer2s": {
+        "impact": "Low",
+        "description": "More efficient networking infrastructure provides a better foundation for Layer 2 operations."
+      },
+      "stakersNodes": {
+        "impact": "Medium",
+        "description": "Significant bandwidth savings during sync operations. Nodes serving historical data gain better tools for announcing their capabilities."
+      },
+      "clClients": {
+        "impact": "Low",
+        "description": "Minimal impact as this primarily affects execution layer networking protocols."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Major implementation work required for new eth/69 protocol including history serving windows, bloom filter removal from receipts, and BlockRangeUpdate messaging."
+      }
     },
     "benefits": [
       "Saves ~530GB of bandwidth per node sync",
@@ -257,15 +729,76 @@
     "title": "EIP-7685: General purpose execution layer requests",
     "status": "Final",
     "description": "Introduces a general framework for execution layer requests to improve protocol extensibility.",
-    "author": "lightclient",
+    "author": "lightclient (@lightclient), Felix Lange (@fjl)",
     "type": "Standards Track",
     "category": "Core",
     "createdDate": "2024-04-14",
     "discussionLink": "https://ethereum-magicians.org/t/eip-7685-general-purpose-execution-layer-requests/19668",
+    "laymanDescription": "This creates a standardized communication channel between Ethereum's execution layer (where transactions happen) and consensus layer (where validation happens). It's like establishing a proper postal system between two cities that previously had to use different methods for each type of message. This framework is used by other Pectra upgrades for deposits and exits.",
+    "northStars": [
+      "scaleL1",
+      "improveUX"
+    ],
+    "northStarAlignment": {
+      "scaleL1": {
+        "impact": "Medium",
+        "description": "Provides efficient infrastructure for cross-layer communication, reducing overhead and complexity."
+      },
+      "improveUX": {
+        "impact": "High",
+        "description": "Enables features like faster deposits and exits by standardizing cross-layer communication."
+      }
+    },
+    "stakeholderImpacts": {
+      "endUsers": {
+        "impact": "None",
+        "description": "No direct impact, but enables other user-facing improvements."
+      },
+      "appDevs": {
+        "impact": "Medium",
+        "description": "New standardized patterns for cross-layer operations in staking and other applications."
+      },
+      "walletDevs": {
+        "impact": "Low",
+        "description": "Indirect benefits through improved staking operations."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "Infrastructure must support new request types and cross-layer communication patterns."
+      },
+      "layer2s": {
+        "impact": "Low",
+        "description": "May benefit from the framework for future cross-layer features."
+      },
+      "stakersNodes": {
+        "impact": "Medium",
+        "description": "More reliable and efficient staking operations through standardized requests."
+      },
+      "clClients": {
+        "impact": "High",
+        "description": "Must implement request processing framework and handle multiple request types."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Must implement request generation and the general framework."
+      }
+    },
+    "benefits": [
+      "Standardizes cross-layer communication",
+      "Enables efficient implementation of deposits and exits",
+      "Provides extensible framework for future features",
+      "Reduces implementation complexity for cross-layer operations",
+      "Improves reliability of consensus-execution coordination"
+    ],
+    "tradeoffs": [
+      "Adds new complexity to the protocol",
+      "Requires coordination between layer implementations",
+      "Initial implementation overhead for the framework"
+    ],
     "forkRelationships": [
       {
         "forkName": "Pectra",
-        "status": "Scheduled"
+        "status": "Included"
       }
     ]
   },
@@ -274,15 +807,71 @@
     "title": "EIP-7691: Blob throughput increase",
     "status": "Final",
     "description": "Increases blob throughput to improve data availability for Layer 2 solutions.",
-    "author": "Ansgar Dietrichs, Dankrad Feist",
+    "author": "Parithosh Jayanthi (@parithosh), Toni Wahrstätter (@nerolation), Sam Calder-Mason (@samcm), Andrew Davis (@savid), Ansgar Dietrichs (@adietrichs)",
     "type": "Standards Track",
     "category": "Core",
     "createdDate": "2024-04-17",
-    "discussionLink": "https://ethereum-magicians.org/t/eip-7691-blob-throughput-increase/19724",
+    "discussionLink": "https://ethereum-magicians.org/t/eip-7691-blob-throughput-increase/19694",
+    "laymanDescription": "This upgrade doubles the amount of data that Layer 2 rollups can post to Ethereum, from 3 to 6 blobs per block (with a maximum of 9). It's like doubling the number of cargo containers a ship can carry - Layer 2s can now process twice as many transactions while maintaining the same security guarantees from Ethereum. This directly translates to lower fees on rollups.",
+    "northStars": [
+      "scaleBlobs"
+    ],
+    "northStarAlignment": {
+      "scaleBlobs": {
+        "impact": "High",
+        "description": "Directly doubles blob throughput, allowing Layer 2s to post more data and reduce costs significantly."
+      }
+    },
+    "stakeholderImpacts": {
+      "endUsers": {
+        "impact": "High",
+        "description": "Users on Layer 2s benefit from lower transaction fees due to increased data availability."
+      },
+      "appDevs": {
+        "impact": "Low",
+        "description": "No changes required, but apps on L2s benefit from higher throughput."
+      },
+      "walletDevs": {
+        "impact": "None",
+        "description": "No changes required for wallets."
+      },
+      "toolingInfra": {
+        "impact": "Medium",
+        "description": "Block explorers and analytics tools need to handle larger blocks with more blobs."
+      },
+      "layer2s": {
+        "impact": "High",
+        "description": "Rollups can post twice as much data, significantly reducing costs and improving throughput."
+      },
+      "stakersNodes": {
+        "impact": "Medium",
+        "description": "Increased bandwidth and storage requirements due to larger blocks, but within acceptable limits."
+      },
+      "clClients": {
+        "impact": "Low",
+        "description": "Minor updates to handle increased blob counts."
+      },
+      "elClients": {
+        "impact": "Medium",
+        "description": "Must update blob gas calculations and block validation for new limits."
+      }
+    },
+    "benefits": [
+      "Doubles data availability for Layer 2 rollups",
+      "Reduces Layer 2 transaction costs significantly",
+      "Improves overall Ethereum scalability",
+      "Maintains security while increasing throughput",
+      "Better utilizes available network capacity"
+    ],
+    "tradeoffs": [
+      "Increases bandwidth requirements for nodes",
+      "Larger blocks require more storage",
+      "May increase node operating costs slightly"
+    ],
     "forkRelationships": [
       {
         "forkName": "Pectra",
-        "status": "Scheduled"
+        "status": "Included"
       }
     ]
   },
@@ -291,15 +880,71 @@
     "title": "EIP-7702: Set EOA account code",
     "status": "Final",
     "description": "Allows Externally Owned Accounts (EOAs) to temporarily set code, enabling account abstraction features.",
-    "author": "Vitalik Buterin, Sam Wilson, Ansgar Dietrichs, Matt Garnett",
+    "author": "Vitalik Buterin (@vbuterin), Sam Wilson (@SamWilsn), Ansgar Dietrichs (@adietrichs), lightclient (@lightclient)",
     "type": "Standards Track",
     "category": "Core",
-    "createdDate": "2024-04-20",
-    "discussionLink": "https://ethereum-magicians.org/t/eip-7702-set-eoa-account-code-for-one-transaction/19769",
+    "createdDate": "2024-05-07",
+    "discussionLink": "https://ethereum-magicians.org/t/eip-7702-set-eoa-account-code/19923",
+    "laymanDescription": "This is one of the most significant user experience improvements in Ethereum's history. It allows regular wallets to temporarily act like smart contracts, enabling features like transaction batching, gas payment in any token, and social recovery. It's like upgrading a basic flip phone to a smartphone - your existing account gains powerful new capabilities without needing to migrate to a new address.",
+    "northStars": [
+      "improveUX"
+    ],
+    "northStarAlignment": {
+      "improveUX": {
+        "impact": "High",
+        "description": "Transforms the user experience by enabling smart contract features on existing EOAs, removing major UX pain points."
+      }
+    },
+    "stakeholderImpacts": {
+      "endUsers": {
+        "impact": "High",
+        "description": "Users can now batch transactions, pay gas in any token, set spending limits, and add account recovery options."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Applications can offer dramatically improved UX with transaction batching, gasless transactions, and session keys."
+      },
+      "walletDevs": {
+        "impact": "High",
+        "description": "Wallets must implement new transaction types and UI for account abstraction features."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "Major updates needed to support new transaction types and account behaviors."
+      },
+      "layer2s": {
+        "impact": "Medium",
+        "description": "Layer 2s benefit from improved UX and may need to support new transaction types."
+      },
+      "stakersNodes": {
+        "impact": "Low",
+        "description": "No significant impact on node operations."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No changes required for consensus clients."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Must implement new transaction type and temporary code execution logic."
+      }
+    },
+    "benefits": [
+      "Enables account abstraction on existing EOAs",
+      "Allows transaction batching and gas sponsorship",
+      "Adds programmable security features to regular wallets",
+      "No migration needed - works with existing addresses",
+      "Opens up innovative wallet features and UX patterns"
+    ],
+    "tradeoffs": [
+      "Adds complexity to transaction processing",
+      "Requires careful security considerations",
+      "Wallets need significant updates to expose features"
+    ],
     "forkRelationships": [
       {
         "forkName": "Pectra",
-        "status": "Scheduled"
+        "status": "Included"
       }
     ]
   },
@@ -320,19 +965,48 @@
       }
     ],
     "laymanDescription": "This introduces a 8192-bit (1024 byte) limit on each input to the MODEXP cryptographic precompile. MODEXP has been a source of consensus bugs due to unbounded inputs. By setting practical limits that cover all real-world use cases (like RSA verification), this reduces the testing surface area and paves the way for future replacement with more efficient EVM code.",
-    "northStars": ["Scale L1"],
+    "northStars": [
+      "scaleL1"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "Low", "description": "Improves network reliability by preventing consensus bugs and reducing testing complexity for a critical precompile." }
+      "scaleL1": {
+        "impact": "Low",
+        "description": "Improves network reliability by preventing consensus bugs and reducing testing complexity for a critical precompile."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "None", "description": "No impact - analysis shows no historical transactions would be affected by these limits." },
-      "appDevs": { "impact": "Low", "description": "Applications using very large cryptographic operations (>8192 bits) would need to restructure, but no known use cases exist." },
-      "walletDevs": { "impact": "None", "description": "No user-facing impact as limits exceed all practical cryptographic use cases." },
-      "toolingInfra": { "impact": "Low", "description": "Gas estimation and fee calculation tools need updates for the new ModExp pricing formula." },
-      "layer2s": { "impact": "Low", "description": "Provides more predictable gas costs for cryptographic operations in L2 smart contracts." },
-      "stakersNodes": { "impact": "Low", "description": "Reduced risk of consensus bugs and more predictable resource usage for MODEXP operations." },
-      "clClients": { "impact": "None", "description": "No changes required for consensus layer implementations." },
-      "elClients": { "impact": "Medium", "description": "Must implement bounds checking for MODEXP inputs and handle new error conditions for oversized inputs." }
+      "endUsers": {
+        "impact": "None",
+        "description": "No impact - analysis shows no historical transactions would be affected by these limits."
+      },
+      "appDevs": {
+        "impact": "Low",
+        "description": "Applications using very large cryptographic operations (>8192 bits) would need to restructure, but no known use cases exist."
+      },
+      "walletDevs": {
+        "impact": "None",
+        "description": "No user-facing impact as limits exceed all practical cryptographic use cases."
+      },
+      "toolingInfra": {
+        "impact": "Low",
+        "description": "Gas estimation and fee calculation tools need updates for the new ModExp pricing formula."
+      },
+      "layer2s": {
+        "impact": "Low",
+        "description": "Provides more predictable gas costs for cryptographic operations in L2 smart contracts."
+      },
+      "stakersNodes": {
+        "impact": "Low",
+        "description": "Reduced risk of consensus bugs and more predictable resource usage for MODEXP operations."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No changes required for consensus layer implementations."
+      },
+      "elClients": {
+        "impact": "Medium",
+        "description": "Must implement bounds checking for MODEXP inputs and handle new error conditions for oversized inputs."
+      }
     },
     "benefits": [
       "Eliminates underpriced cryptographic operations",
@@ -358,20 +1032,53 @@
       }
     ],
     "laymanDescription": "This introduces a 30 million gas cap for individual transactions, preventing any single transaction from consuming most of a block. The goal is to ensure fairer access to block space and improve network stability.",
-    "northStars": ["Scale L1", "Improve UX"],
+    "northStars": [
+      "scaleL1",
+      "improveUX"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "Medium", "description": "Improves network stability and resilience against DoS attacks by preventing individual transactions from consuming excessive block space, enabling more predictable block validation times." },
-      "improveUX": { "impact": "Medium", "description": "More predictable transaction inclusion and fairer access to block space, though may require some large applications to restructure their operations." }
+      "scaleL1": {
+        "impact": "Medium",
+        "description": "Improves network stability and resilience against DoS attacks by preventing individual transactions from consuming excessive block space, enabling more predictable block validation times."
+      },
+      "improveUX": {
+        "impact": "Medium",
+        "description": "More predictable transaction inclusion and fairer access to block space, though may require some large applications to restructure their operations."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Low", "description": "Most users unaffected as typical transactions use far less than 30M gas. Edge cases with very complex operations may need to restructure." },
-      "appDevs": { "impact": "High", "description": "Applications with very large transactions (complex DeFi, large contract deployments) may need to split operations or redesign architecture to stay under the cap." },
-      "walletDevs": { "impact": "Low", "description": "Need to enforce the gas cap in transaction creation, but most wallet operations are well below the limit." },
-      "toolingInfra": { "impact": "Medium", "description": "Gas estimation tools, transaction builders, and deployment scripts need updates to enforce the 30M gas cap." },
-      "layer2s": { "impact": "Medium", "description": "Could impact future L2 bundling strategies and settlement transaction designs. May conflict with efficient batch processing approaches." },
-      "stakersNodes": { "impact": "Low", "description": "More predictable block processing times and reduced risk of validation bottlenecks from extremely large transactions." },
-      "clClients": { "impact": "None", "description": "No direct impact on consensus layer operations as this affects execution layer transaction validation." },
-      "elClients": { "impact": "Medium", "description": "Need to implement transaction pool validation to reject transactions exceeding the gas cap and block validation to reject blocks containing invalid transactions." }
+      "endUsers": {
+        "impact": "Low",
+        "description": "Most users unaffected as typical transactions use far less than 30M gas. Edge cases with very complex operations may need to restructure."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Applications with very large transactions (complex DeFi, large contract deployments) may need to split operations or redesign architecture to stay under the cap."
+      },
+      "walletDevs": {
+        "impact": "Low",
+        "description": "Need to enforce the gas cap in transaction creation, but most wallet operations are well below the limit."
+      },
+      "toolingInfra": {
+        "impact": "Medium",
+        "description": "Gas estimation tools, transaction builders, and deployment scripts need updates to enforce the 30M gas cap."
+      },
+      "layer2s": {
+        "impact": "Medium",
+        "description": "Could impact future L2 bundling strategies and settlement transaction designs. May conflict with efficient batch processing approaches."
+      },
+      "stakersNodes": {
+        "impact": "Low",
+        "description": "More predictable block processing times and reduced risk of validation bottlenecks from extremely large transactions."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No direct impact on consensus layer operations as this affects execution layer transaction validation."
+      },
+      "elClients": {
+        "impact": "Medium",
+        "description": "Need to implement transaction pool validation to reject transactions exceeding the gas cap and block validation to reject blocks containing invalid transactions."
+      }
     },
     "benefits": [
       "Prevents single transactions from hogging block space",
@@ -385,15 +1092,69 @@
     "title": "EIP-7840: Add blob schedule to EL config files",
     "status": "Final",
     "description": "Adds blob schedule configuration to execution layer config files for better blob management.",
-    "author": "lightclient",
+    "author": "lightclient (@lightclient)",
     "type": "Informational",
     "category": "Interface",
-    "createdDate": "2024-05-01",
-    "discussionLink": "https://ethereum-magicians.org/t/eip-7840-add-blob-schedule-to-el-config-files/20100",
+    "createdDate": "2024-12-12",
+    "discussionLink": "https://ethereum-magicians.org/t/eip-7840-add-blob-schedule-to-execution-client-configuration-files/22182",
+    "laymanDescription": "This technical improvement adds blob-related configuration to execution layer config files, making it easier for node operators and tools to understand blob parameters. It's like adding a shipping manifest to a cargo ship - the information was already there, but now it's organized in a standard place where everyone can find it.",
+    "northStars": [
+      "scaleBlobs"
+    ],
+    "northStarAlignment": {
+      "scaleBlobs": {
+        "impact": "Low",
+        "description": "Improves operational aspects of blob handling without directly increasing capacity."
+      }
+    },
+    "stakeholderImpacts": {
+      "endUsers": {
+        "impact": "None",
+        "description": "No direct impact on end users."
+      },
+      "appDevs": {
+        "impact": "Low",
+        "description": "Easier access to blob configuration information for applications that need it."
+      },
+      "walletDevs": {
+        "impact": "None",
+        "description": "No impact on wallet implementations."
+      },
+      "toolingInfra": {
+        "impact": "Medium",
+        "description": "Tools can now reliably read blob configuration from standard locations."
+      },
+      "layer2s": {
+        "impact": "Low",
+        "description": "Slightly easier configuration management for rollup operators."
+      },
+      "stakersNodes": {
+        "impact": "Low",
+        "description": "Clearer configuration for blob-related parameters."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No changes required for consensus clients."
+      },
+      "elClients": {
+        "impact": "Low",
+        "description": "Must expose blob configuration in config files."
+      }
+    },
+    "benefits": [
+      "Standardizes blob configuration across clients",
+      "Improves operational clarity for node operators",
+      "Makes blob parameters more discoverable",
+      "Reduces configuration errors",
+      "Simplifies tooling development"
+    ],
+    "tradeoffs": [
+      "Minor additional complexity in configuration files"
+    ],
     "forkRelationships": [
       {
         "forkName": "Pectra",
-        "status": "Scheduled"
+        "status": "Included"
       }
     ]
   },
@@ -414,19 +1175,48 @@
       }
     ],
     "laymanDescription": "This increases the gas cost of the ModExp cryptographic precompile to address underpriced operations. It raises the minimum cost from 200 to 500 gas and doubles costs for large inputs over 32 bytes.",
-    "northStars": ["Scale L1"],
+    "northStars": [
+      "scaleL1"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "Low", "description": "Improves network economic sustainability by ensuring cryptographic precompiles are properly priced, preventing potential DoS vectors from underpriced operations." }
+      "scaleL1": {
+        "impact": "Low",
+        "description": "Improves network economic sustainability by ensuring cryptographic precompiles are properly priced, preventing potential DoS vectors from underpriced operations."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Low", "description": "Most users unaffected. Applications using ModExp with large inputs (>32 bytes) will see increased gas costs." },
-      "appDevs": { "impact": "Medium", "description": "Applications using RSA verification, large modular exponentiation, or cryptographic protocols with big numbers may need to optimize or budget for higher costs." },
-      "walletDevs": { "impact": "None", "description": "No impact as wallets typically don't use ModExp precompile directly." },
-      "toolingInfra": { "impact": "Low", "description": "Gas estimation and fee calculation tools need updates for the new ModExp pricing formula." },
-      "layer2s": { "impact": "Low", "description": "L2s using ModExp precompile for cryptographic operations will see increased costs for large input operations." },
-      "stakersNodes": { "impact": "Low", "description": "Better compensation alignment for computational work, reduced risk of DoS attacks through underpriced operations." },
-      "clClients": { "impact": "None", "description": "No direct impact on consensus layer operations as this affects execution layer precompile pricing." },
-      "elClients": { "impact": "Medium", "description": "Need to implement the updated ModExp pricing formula with new minimum costs and scaling factors for large inputs." }
+      "endUsers": {
+        "impact": "Low",
+        "description": "Most users unaffected. Applications using ModExp with large inputs (>32 bytes) will see increased gas costs."
+      },
+      "appDevs": {
+        "impact": "Medium",
+        "description": "Applications using RSA verification, large modular exponentiation, or cryptographic protocols with big numbers may need to optimize or budget for higher costs."
+      },
+      "walletDevs": {
+        "impact": "None",
+        "description": "No impact as wallets typically don't use ModExp precompile directly."
+      },
+      "toolingInfra": {
+        "impact": "Low",
+        "description": "Gas estimation and fee calculation tools need updates for the new ModExp pricing formula."
+      },
+      "layer2s": {
+        "impact": "Low",
+        "description": "L2s using ModExp precompile for cryptographic operations will see increased costs for large input operations."
+      },
+      "stakersNodes": {
+        "impact": "Low",
+        "description": "Better compensation alignment for computational work, reduced risk of DoS attacks through underpriced operations."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No direct impact on consensus layer operations as this affects execution layer precompile pricing."
+      },
+      "elClients": {
+        "impact": "Medium",
+        "description": "Need to implement the updated ModExp pricing formula with new minimum costs and scaling factors for large inputs."
+      }
     },
     "benefits": [
       "Fixes underpriced ModExp operations that cost less than simpler precompiles",
@@ -451,20 +1241,53 @@
       }
     ],
     "laymanDescription": "This creates a new lightweight process to adjust blob storage parameters. Instead of waiting for a major upgrade, Ethereum can make smaller, more frequent adjustments to blob capacity to accommodate changing demand from Layer 2s.",
-    "northStars": ["Scale blobs", "Improve UX"],
+    "northStars": [
+      "scaleBlobs",
+      "improveUX"
+    ],
     "northStarAlignment": {
-      "scaleBlobs": { "impact": "High", "description": "Directly addresses the rapid growth in L2 data availability demand by enabling more frequent, incremental blob capacity increases to prevent sustained saturation." },
-      "improveUX": { "impact": "Medium", "description": "Provides predictable scaling framework that gives L2 builders confidence to commit to Ethereum over alternative DA solutions." }
+      "scaleBlobs": {
+        "impact": "High",
+        "description": "Directly addresses the rapid growth in L2 data availability demand by enabling more frequent, incremental blob capacity increases to prevent sustained saturation."
+      },
+      "improveUX": {
+        "impact": "Medium",
+        "description": "Provides predictable scaling framework that gives L2 builders confidence to commit to Ethereum over alternative DA solutions."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Low", "description": "Indirect benefits through more responsive blob capacity scaling leading to lower and more stable L2 transaction costs." },
-      "appDevs": { "impact": "Medium", "description": "More predictable data availability scaling gives developers confidence to build applications requiring consistent blob capacity growth." },
-      "walletDevs": { "impact": "Low", "description": "Minimal direct impact. Benefits indirectly through improved L2 scaling economics and more stable transaction costs." },
-      "toolingInfra": { "impact": "High", "description": "Major updates needed for upgrade tracking, blob parameter monitoring, and tooling to handle the new BPO fork mechanism." },
-      "layer2s": { "impact": "High", "description": "Critical for L2 growth strategy - enables continuous scaling of data availability capacity to match rapidly growing demand without waiting for major hard forks." },
-      "stakersNodes": { "impact": "Medium", "description": "Need to handle more frequent but lighter-weight network upgrades. Simplified upgrade process reduces operational overhead compared to full hard forks." },
-      "clClients": { "impact": "High", "description": "Significant changes needed for blob schedule management, modified compute_fork_digest implementation, and P2P networking updates including ENR extensions." },
-      "elClients": { "impact": "High", "description": "Major implementation work required for blob schedule configuration management, activation timestamp handling, and coordination with consensus layer blob parameter changes." }
+      "endUsers": {
+        "impact": "Low",
+        "description": "Indirect benefits through more responsive blob capacity scaling leading to lower and more stable L2 transaction costs."
+      },
+      "appDevs": {
+        "impact": "Medium",
+        "description": "More predictable data availability scaling gives developers confidence to build applications requiring consistent blob capacity growth."
+      },
+      "walletDevs": {
+        "impact": "Low",
+        "description": "Minimal direct impact. Benefits indirectly through improved L2 scaling economics and more stable transaction costs."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "Major updates needed for upgrade tracking, blob parameter monitoring, and tooling to handle the new BPO fork mechanism."
+      },
+      "layer2s": {
+        "impact": "High",
+        "description": "Critical for L2 growth strategy - enables continuous scaling of data availability capacity to match rapidly growing demand without waiting for major hard forks."
+      },
+      "stakersNodes": {
+        "impact": "Medium",
+        "description": "Need to handle more frequent but lighter-weight network upgrades. Simplified upgrade process reduces operational overhead compared to full hard forks."
+      },
+      "clClients": {
+        "impact": "High",
+        "description": "Significant changes needed for blob schedule management, modified compute_fork_digest implementation, and P2P networking updates including ENR extensions."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Major implementation work required for blob schedule configuration management, activation timestamp handling, and coordination with consensus layer blob parameter changes."
+      }
     },
     "benefits": [
       "Faster response to Layer 2 data demand growth",
@@ -490,19 +1313,48 @@
       }
     ],
     "laymanDescription": "This addresses blob fee market problems by introducing a reserve price tied to execution costs. When Layer 2 execution costs dominate blob costs, this prevents the blob fee market from becoming ineffective at 1 wei. See a storybook-style explanation [here](https://notes.ethereum.org/@anderselowsson/AIG)!",
-    "northStars": ["Scale blobs"],
+    "northStars": [
+      "scaleBlobs"
+    ],
     "northStarAlignment": {
-      "scaleBlobs": { "impact": "High", "description": "Critical for L2 economics - ensures sustainable blob pricing that reflects true costs and maintains effective price discovery as L2 usage scales." }
+      "scaleBlobs": {
+        "impact": "High",
+        "description": "Critical for L2 economics - ensures sustainable blob pricing that reflects true costs and maintains effective price discovery as L2 usage scales."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Medium", "description": "More stable and predictable Layer 2 transaction costs, avoiding dramatic fee spikes when blob market becomes inelastic." },
-      "appDevs": { "impact": "Low", "description": "More predictable blob cost modeling for applications, especially those with consistent data posting patterns." },
-      "walletDevs": { "impact": "Low", "description": "More predictable fee estimation for Layer 2 transactions due to improved blob pricing stability." },
-      "toolingInfra": { "impact": "Medium", "description": "Blob fee estimation tools and Layer 2 cost analysis dashboards need updates for the new reserve price mechanism." },
-      "layer2s": { "impact": "High", "description": "Fundamental improvement to blob economics - prevents scenarios where blob fees become insignificant relative to execution costs, ensuring healthy fee market dynamics." },
-      "stakersNodes": { "impact": "Medium", "description": "Ensures fair compensation for KZG proof verification compute costs through minimum blob pricing tied to execution base fee." },
-      "clClients": { "impact": "Low", "description": "Minimal impact as this primarily affects execution layer blob fee calculation mechanisms." },
-      "elClients": { "impact": "Medium", "description": "Need to implement modified calc_excess_blob_gas() function with new reserve price logic and BLOB_BASE_COST parameter." }
+      "endUsers": {
+        "impact": "Medium",
+        "description": "More stable and predictable Layer 2 transaction costs, avoiding dramatic fee spikes when blob market becomes inelastic."
+      },
+      "appDevs": {
+        "impact": "Low",
+        "description": "More predictable blob cost modeling for applications, especially those with consistent data posting patterns."
+      },
+      "walletDevs": {
+        "impact": "Low",
+        "description": "More predictable fee estimation for Layer 2 transactions due to improved blob pricing stability."
+      },
+      "toolingInfra": {
+        "impact": "Medium",
+        "description": "Blob fee estimation tools and Layer 2 cost analysis dashboards need updates for the new reserve price mechanism."
+      },
+      "layer2s": {
+        "impact": "High",
+        "description": "Fundamental improvement to blob economics - prevents scenarios where blob fees become insignificant relative to execution costs, ensuring healthy fee market dynamics."
+      },
+      "stakersNodes": {
+        "impact": "Medium",
+        "description": "Ensures fair compensation for KZG proof verification compute costs through minimum blob pricing tied to execution base fee."
+      },
+      "clClients": {
+        "impact": "Low",
+        "description": "Minimal impact as this primarily affects execution layer blob fee calculation mechanisms."
+      },
+      "elClients": {
+        "impact": "Medium",
+        "description": "Need to implement modified calc_excess_blob_gas() function with new reserve price logic and BLOB_BASE_COST parameter."
+      }
     },
     "benefits": [
       "Prevents blob fee market collapse",
@@ -527,19 +1379,48 @@
       }
     ],
     "laymanDescription": "This proposes increasing the gas limit from 36M to a higher value (specific amount TBD) to scale L1 execution capacity. While this change does not require a hard fork (gas limit is a validator-chosen parameter), it requires extensive testing to ensure network stability at higher computational loads and so inclusion of the EIP in the hard fork ensures that this work is prioritized and ongoing.",
-    "northStars": ["Scale L1"],
+    "northStars": [
+      "scaleL1"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "High", "description": "Directly increases overall network throughput by allowing more computation per block, the most straightforward way to scale L1 execution capacity." }
+      "scaleL1": {
+        "impact": "High",
+        "description": "Directly increases overall network throughput by allowing more computation per block, the most straightforward way to scale L1 execution capacity."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Medium", "description": "Benefits from higher throughput and faster transaction processing, but potential risks if inadequately tested or if RPC infrastructure can't keep up." },
-      "appDevs": { "impact": "High", "description": "Can build more sophisticated applications without hitting gas limits, but need to be aware that the specific limit value is still TBD." },
-      "walletDevs": { "impact": "Medium", "description": "Better user experience with faster confirmations, but RPC node performance impacts could affect wallet reliability." },
-      "toolingInfra": { "impact": "High", "description": "RPC providers, indexers, and monitoring tools need significant updates to handle larger blocks and higher computational loads." },
-      "layer2s": { "impact": "Low", "description": "More block space available for settlement transactions, but coordination needed with EIP-7825's 30M transaction cap." },
-      "stakersNodes": { "impact": "High", "description": "Need significantly more computational power to process larger blocks. Validator hardware requirements may increase substantially." },
-      "clClients": { "impact": "Medium", "description": "Must handle larger execution payloads and ensure consensus layer can propagate larger blocks within gossip limits." },
-      "elClients": { "impact": "High", "description": "Major testing and bug-fixing effort required to handle larger blocks safely. Must update default gas limit configurations and ensure stability at higher computational loads." }
+      "endUsers": {
+        "impact": "Medium",
+        "description": "Benefits from higher throughput and faster transaction processing, but potential risks if inadequately tested or if RPC infrastructure can't keep up."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Can build more sophisticated applications without hitting gas limits, but need to be aware that the specific limit value is still TBD."
+      },
+      "walletDevs": {
+        "impact": "Medium",
+        "description": "Better user experience with faster confirmations, but RPC node performance impacts could affect wallet reliability."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "RPC providers, indexers, and monitoring tools need significant updates to handle larger blocks and higher computational loads."
+      },
+      "layer2s": {
+        "impact": "Low",
+        "description": "More block space available for settlement transactions, but coordination needed with EIP-7825's 30M transaction cap."
+      },
+      "stakersNodes": {
+        "impact": "High",
+        "description": "Need significantly more computational power to process larger blocks. Validator hardware requirements may increase substantially."
+      },
+      "clClients": {
+        "impact": "Medium",
+        "description": "Must handle larger execution payloads and ensure consensus layer can propagate larger blocks within gossip limits."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Major testing and bug-fixing effort required to handle larger blocks safely. Must update default gas limit configurations and ensure stability at higher computational loads."
+      }
     },
     "benefits": [
       "Directly increases mainnet throughput",
@@ -565,20 +1446,53 @@
       }
     ],
     "laymanDescription": "This introduces a new PAY opcode that transfers ETH without executing recipient code, solving critical security issues with current transfer methods. It prevents reentrancy attacks and eliminates DoS vectors from malicious recipient contracts.",
-    "northStars": ["Improve UX", "Scale L1"],
+    "northStars": [
+      "improveUX",
+      "scaleL1"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "Low", "description": "Minor gas efficiency improvements for ETH transfers by avoiding unnecessary code execution and removing security overhead." },
-      "improveUX": { "impact": "Medium", "description": "Significantly improves smart contract security by eliminating reentrancy vectors and DoS attacks from ETH transfers, enabling safer application development." }
+      "scaleL1": {
+        "impact": "Low",
+        "description": "Minor gas efficiency improvements for ETH transfers by avoiding unnecessary code execution and removing security overhead."
+      },
+      "improveUX": {
+        "impact": "Medium",
+        "description": "Significantly improves smart contract security by eliminating reentrancy vectors and DoS attacks from ETH transfers, enabling safer application development."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Low", "description": "Indirect benefits through safer smart contract interactions and potentially lower gas costs for ETH transfers." },
-      "appDevs": { "impact": "High", "description": "Major security improvement - eliminates reentrancy attack vectors from ETH transfers and enables new safe transfer patterns, but need to understand bypass of fallback functions." },
-      "walletDevs": { "impact": "Medium", "description": "Can implement more efficient withdrawal and transfer mechanisms, especially for smart contract wallets avoiding reentrancy concerns." },
-      "toolingInfra": { "impact": "Medium", "description": "Transaction analysis tools, debuggers, and smart contract libraries need updates to support the new PAY opcode." },
-      "layer2s": { "impact": "Low", "description": "More efficient and secure ETH handling in Layer 2 smart contracts and bridge protocols." },
-      "stakersNodes": { "impact": "Low", "description": "Slightly more efficient transaction processing due to reduced code execution for simple ETH transfers." },
-      "clClients": { "impact": "None", "description": "No direct impact on consensus layer operations as this affects execution layer opcodes." },
-      "elClients": { "impact": "Medium", "description": "Need to implement new PAY opcode (0xfc) with proper gas accounting using EIP-2929 warm/cold access patterns and new account creation costs." }
+      "endUsers": {
+        "impact": "Low",
+        "description": "Indirect benefits through safer smart contract interactions and potentially lower gas costs for ETH transfers."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Major security improvement - eliminates reentrancy attack vectors from ETH transfers and enables new safe transfer patterns, but need to understand bypass of fallback functions."
+      },
+      "walletDevs": {
+        "impact": "Medium",
+        "description": "Can implement more efficient withdrawal and transfer mechanisms, especially for smart contract wallets avoiding reentrancy concerns."
+      },
+      "toolingInfra": {
+        "impact": "Medium",
+        "description": "Transaction analysis tools, debuggers, and smart contract libraries need updates to support the new PAY opcode."
+      },
+      "layer2s": {
+        "impact": "Low",
+        "description": "More efficient and secure ETH handling in Layer 2 smart contracts and bridge protocols."
+      },
+      "stakersNodes": {
+        "impact": "Low",
+        "description": "Slightly more efficient transaction processing due to reduced code execution for simple ETH transfers."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No direct impact on consensus layer operations as this affects execution layer opcodes."
+      },
+      "elClients": {
+        "impact": "Medium",
+        "description": "Need to implement new PAY opcode (0xfc) with proper gas accounting using EIP-2929 warm/cold access patterns and new account creation costs."
+      }
     },
     "benefits": [
       "Eliminates reentrancy attacks from ETH transfers",
@@ -604,20 +1518,53 @@
       }
     ],
     "laymanDescription": "This increases the contract code size limit from 24KB to 256KB and introduces gas metering for larger contracts. The change eliminates the need for complex architectural workarounds and enables more sophisticated single-contract applications.",
-    "northStars": ["Improve UX", "Scale L1"],
+    "northStars": [
+      "improveUX",
+      "scaleL1"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "Low", "description": "Better resource management and gas metering for large contracts while maintaining network efficiency and preventing DoS attacks." },
-      "improveUX": { "impact": "High", "description": "Major developer experience improvement - eliminates need for complex architectural patterns like Diamond Standard, reduces deployment complexity, and enables single-contract solutions." }
+      "scaleL1": {
+        "impact": "Low",
+        "description": "Better resource management and gas metering for large contracts while maintaining network efficiency and preventing DoS attacks."
+      },
+      "improveUX": {
+        "impact": "High",
+        "description": "Major developer experience improvement - eliminates need for complex architectural patterns like Diamond Standard, reduces deployment complexity, and enables single-contract solutions."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Low", "description": "Indirect benefits through access to more sophisticated single-contract applications and potentially lower gas costs from reduced cross-contract calls." },
-      "appDevs": { "impact": "High", "description": "Eliminates major architectural constraints - can build larger, more complex contracts without splitting logic across multiple contracts or using proxy patterns." },
-      "walletDevs": { "impact": "Low", "description": "Can interact with more sophisticated single-contract applications, but need to handle higher gas costs for large contract interactions." },
-      "toolingInfra": { "impact": "Medium", "description": "Contract verification tools, static analysis, and deployment infrastructure need updates to handle larger contracts and new gas metering." },
-      "layer2s": { "impact": "Low", "description": "Can deploy larger, more sophisticated infrastructure contracts without hitting size limits." },
-      "stakersNodes": { "impact": "Medium", "description": "Need updated client implementations with proper gas metering and efficient codesize indexing. Larger contracts may increase storage and processing requirements." },
-      "clClients": { "impact": "None", "description": "No direct impact on consensus layer operations as this affects execution layer contract deployment and metering." },
-      "elClients": { "impact": "Medium", "description": "Need to implement new gas metering for code-loading operations, warm/cold code access tracking, and efficient codesize indexing to avoid DoS attacks from large contract loads." }
+      "endUsers": {
+        "impact": "Low",
+        "description": "Indirect benefits through access to more sophisticated single-contract applications and potentially lower gas costs from reduced cross-contract calls."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Eliminates major architectural constraints - can build larger, more complex contracts without splitting logic across multiple contracts or using proxy patterns."
+      },
+      "walletDevs": {
+        "impact": "Low",
+        "description": "Can interact with more sophisticated single-contract applications, but need to handle higher gas costs for large contract interactions."
+      },
+      "toolingInfra": {
+        "impact": "Medium",
+        "description": "Contract verification tools, static analysis, and deployment infrastructure need updates to handle larger contracts and new gas metering."
+      },
+      "layer2s": {
+        "impact": "Low",
+        "description": "Can deploy larger, more sophisticated infrastructure contracts without hitting size limits."
+      },
+      "stakersNodes": {
+        "impact": "Medium",
+        "description": "Need updated client implementations with proper gas metering and efficient codesize indexing. Larger contracts may increase storage and processing requirements."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No direct impact on consensus layer operations as this affects execution layer contract deployment and metering."
+      },
+      "elClients": {
+        "impact": "Medium",
+        "description": "Need to implement new gas metering for code-loading operations, warm/cold code access tracking, and efficient codesize indexing to avoid DoS attacks from large contract loads."
+      }
     },
     "benefits": [
       "Enables much larger smart contracts (10x size increase)",
@@ -629,7 +1576,7 @@
   {
     "id": 7951,
     "title": "EIP-7951: Precompile for secp256r1 Curve Support",
-    "status": "Draft", 
+    "status": "Draft",
     "description": "Add precompiled contract for secp256r1 ECDSA signature verification with proper security checks",
     "author": "Carl Beekhuizen (@carlbeek), Ulaş Erdoğan (@ulerdogan), Doğan Alpaslan (@doganalpaslan)",
     "type": "Standards Track",
@@ -643,19 +1590,48 @@
       }
     ],
     "laymanDescription": "This adds support for a widely-used cryptographic curve called secp256r1 (also known as P-256) to Ethereum. Currently, Ethereum only supports the secp256k1 curve for signatures, but many devices and systems use secp256r1. This change allows Ethereum to verify signatures from devices like iPhones, Android phones, hardware wallets, and other systems that use this standard curve, making it easier to integrate with existing infrastructure. Note: This EIP supercedes [RIP-7212](https://github.com/ethereum/RIPs/blob/master/RIPS/rip-7212.md).",
-    "northStars": ["Improve UX"],
+    "northStars": [
+      "improveUX"
+    ],
     "northStarAlignment": {
-      "improveUX": { "impact": "High", "description": "Dramatically improves user experience by enabling native integration with billions of devices that use secp256r1, eliminating the need for complex signature conversion or additional infrastructure." }
+      "improveUX": {
+        "impact": "High",
+        "description": "Dramatically improves user experience by enabling native integration with billions of devices that use secp256r1, eliminating the need for complex signature conversion or additional infrastructure."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "High", "description": "Can use their existing devices (phones, hardware wallets) to sign Ethereum transactions without additional software or conversion steps." },
-      "appDevs": { "impact": "Medium", "description": "Can integrate with existing secp256r1-based systems and devices more easily, reducing development complexity for authentication and signing flows." },
-      "walletDevs": { "impact": "High", "description": "Can support native signing from devices that use secp256r1, improving wallet compatibility and user experience across different platforms." },
-      "toolingInfra": { "impact": "Medium", "description": "Need to implement secp256r1 signature verification in tooling, but gain ability to work with broader ecosystem of devices and systems." },
-      "layer2s": { "impact": "Low", "description": "Can leverage secp256r1 signatures for Layer 2 operations, improving compatibility with existing infrastructure." },
-      "stakersNodes": { "impact": "Low", "description": "Minimal impact as this primarily affects transaction validation and doesn't change consensus or staking mechanics." },
-      "clClients": { "impact": "None", "description": "No impact on consensus layer as this affects execution layer transaction validation." },
-      "elClients": { "impact": "Medium", "description": "Need to implement secp256r1 precompile for efficient signature verification, but this is a well-established cryptographic standard." }
+      "endUsers": {
+        "impact": "High",
+        "description": "Can use their existing devices (phones, hardware wallets) to sign Ethereum transactions without additional software or conversion steps."
+      },
+      "appDevs": {
+        "impact": "Medium",
+        "description": "Can integrate with existing secp256r1-based systems and devices more easily, reducing development complexity for authentication and signing flows."
+      },
+      "walletDevs": {
+        "impact": "High",
+        "description": "Can support native signing from devices that use secp256r1, improving wallet compatibility and user experience across different platforms."
+      },
+      "toolingInfra": {
+        "impact": "Medium",
+        "description": "Need to implement secp256r1 signature verification in tooling, but gain ability to work with broader ecosystem of devices and systems."
+      },
+      "layer2s": {
+        "impact": "Low",
+        "description": "Can leverage secp256r1 signatures for Layer 2 operations, improving compatibility with existing infrastructure."
+      },
+      "stakersNodes": {
+        "impact": "Low",
+        "description": "Minimal impact as this primarily affects transaction validation and doesn't change consensus or staking mechanics."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No impact on consensus layer as this affects execution layer transaction validation."
+      },
+      "elClients": {
+        "impact": "Medium",
+        "description": "Need to implement secp256r1 precompile for efficient signature verification, but this is a well-established cryptographic standard."
+      }
     },
     "benefits": [
       "Enables native integration with billions of secp256r1 devices",
@@ -671,30 +1647,59 @@
     "status": "Draft",
     "description": "Pre-calculate and store a deterministic proposer lookahead in the beacon state at the start of every epoch",
     "author": "Lin Oshitani (@linoscope) <lin@nethermind.io>, Justin Drake (@JustinDrake) <justin@ethereum.org>",
-    "type": "Standards Track", 
+    "type": "Standards Track",
     "category": "Core",
     "createdDate": "2025-03-24",
     "discussionLink": "https://ethereum-magicians.org/t/eip-7917-deterministic-proposer-lookahead/23259",
     "forkRelationships": [
       {
-        "forkName": "Fusaka", 
+        "forkName": "Fusaka",
         "status": "Scheduled"
       }
     ],
     "laymanDescription": "This makes Ethereum's block proposer schedule completely predictable ahead of time. Currently, validators can't know who will propose blocks in the next epoch until it starts, which creates uncertainty for MEV mitigation and preconfirmation protocols. This change pre-calculates and stores the proposer schedule for future epochs, making it deterministic and accessible to applications.",
-    "northStars": ["Improve UX"],
+    "northStars": [
+      "improveUX"
+    ],
     "northStarAlignment": {
-      "improveUX": { "impact": "High", "description": "Enables reliable preconfirmation services and improved transaction ordering predictability." }
+      "improveUX": {
+        "impact": "High",
+        "description": "Enables reliable preconfirmation services and improved transaction ordering predictability."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Medium", "description": "Better protection from MEV extraction through improved preconfirmation services and more predictable transaction ordering." },
-      "appDevs": { "impact": "High", "description": "Can build more sophisticated MEV mitigation strategies and preconfirmation protocols with predictable proposer schedules." },
-      "walletDevs": { "impact": "Medium", "description": "Can implement better MEV protection features and more reliable transaction timing predictions for users." },
-      "toolingInfra": { "impact": "High", "description": "MEV analysis tools, preconfirmation services, and block builder infrastructure need updates to leverage predictable proposer schedules." },
-      "layer2s": { "impact": "Medium", "description": "More predictable L1 block production timing improves Layer 2 settlement coordination and transaction scheduling." },
-      "stakersNodes": { "impact": "Low", "description": "Minimal impact on validator operations, but provides better visibility into future proposer assignments." },
-      "clClients": { "impact": "Medium", "description": "Need to implement proposer lookahead calculation and storage in beacon state, with additional computation at epoch boundaries." },
-      "elClients": { "impact": "Low", "description": "Minimal impact as this primarily affects consensus layer proposer scheduling and beacon state management." }
+      "endUsers": {
+        "impact": "Medium",
+        "description": "Better protection from MEV extraction through improved preconfirmation services and more predictable transaction ordering."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Can build more sophisticated MEV mitigation strategies and preconfirmation protocols with predictable proposer schedules."
+      },
+      "walletDevs": {
+        "impact": "Medium",
+        "description": "Can implement better MEV protection features and more reliable transaction timing predictions for users."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "MEV analysis tools, preconfirmation services, and block builder infrastructure need updates to leverage predictable proposer schedules."
+      },
+      "layer2s": {
+        "impact": "Medium",
+        "description": "More predictable L1 block production timing improves Layer 2 settlement coordination and transaction scheduling."
+      },
+      "stakersNodes": {
+        "impact": "Low",
+        "description": "Minimal impact on validator operations, but provides better visibility into future proposer assignments."
+      },
+      "clClients": {
+        "impact": "Medium",
+        "description": "Need to implement proposer lookahead calculation and storage in beacon state, with additional computation at epoch boundaries."
+      },
+      "elClients": {
+        "impact": "Low",
+        "description": "Minimal impact as this primarily affects consensus layer proposer scheduling and beacon state management."
+      }
     },
     "benefits": [
       "Improves predictability for based preconfirmation protocols",
@@ -708,7 +1713,7 @@
     "description": "Introduce a protocol-level cap on the maximum RLP-encoded block size to 10 MiB, including a 2 MiB margin for beacon block size.",
     "author": "Giulio Rebuffo (@Giulio2002), Ben Adams (@benaadams), Storm Slivkoff (@sslivkoff)",
     "type": "Standards Track",
-    "category": "Core", 
+    "category": "Core",
     "createdDate": "2025-04-16",
     "discussionLink": "https://ethereum-magicians.org/t/eip-7934-add-bytesize-limit-to-blocks/23589",
     "forkRelationships": [
@@ -718,19 +1723,48 @@
       }
     ],
     "laymanDescription": "This adds a maximum size limit of 10MB to Ethereum blocks to prevent network instability and denial-of-service attacks. Currently, blocks can grow very large, which slows down network propagation and increases the risk of temporary forks. This limit ensures blocks stay within a reasonable size that the network can efficiently process and propagate.",
-    "northStars": ["Scale L1"],
+    "northStars": [
+      "scaleL1"
+    ],
     "northStarAlignment": {
-      "improveUX": { "impact": "Low", "description": "Improves network reliability and reduces the risk of temporary forks, leading to more consistent transaction confirmation times." }
+      "improveUX": {
+        "impact": "Low",
+        "description": "Improves network reliability and reduces the risk of temporary forks, leading to more consistent transaction confirmation times."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Low", "description": "More reliable network with reduced risk of temporary forks and more consistent transaction confirmation times." },
-      "appDevs": { "impact": "Low", "description": "More predictable block propagation and reduced risk of network instability affecting transaction processing." },
-      "walletDevs": { "impact": "Low", "description": "More reliable transaction confirmation times and reduced risk of network issues affecting wallet operations." },
-      "toolingInfra": { "impact": "Low", "description": "More predictable block sizes and network behavior, simplifying infrastructure planning and monitoring." },
-      "layer2s": { "impact": "Low", "description": "More reliable base layer for settlement transactions with reduced risk of network instability." },
-      "stakersNodes": { "impact": "Medium", "description": "Need to implement block size validation, but benefit from more stable network propagation and reduced DoS risks." },
-      "clClients": { "impact": "Low", "description": "Minimal impact as this primarily affects execution layer block validation and propagation." },
-      "elClients": { "impact": "Medium", "description": "Need to implement block size validation logic and ensure block construction respects the new size limits." }
+      "endUsers": {
+        "impact": "Low",
+        "description": "More reliable network with reduced risk of temporary forks and more consistent transaction confirmation times."
+      },
+      "appDevs": {
+        "impact": "Low",
+        "description": "More predictable block propagation and reduced risk of network instability affecting transaction processing."
+      },
+      "walletDevs": {
+        "impact": "Low",
+        "description": "More reliable transaction confirmation times and reduced risk of network issues affecting wallet operations."
+      },
+      "toolingInfra": {
+        "impact": "Low",
+        "description": "More predictable block sizes and network behavior, simplifying infrastructure planning and monitoring."
+      },
+      "layer2s": {
+        "impact": "Low",
+        "description": "More reliable base layer for settlement transactions with reduced risk of network instability."
+      },
+      "stakersNodes": {
+        "impact": "Medium",
+        "description": "Need to implement block size validation, but benefit from more stable network propagation and reduced DoS risks."
+      },
+      "clClients": {
+        "impact": "Low",
+        "description": "Minimal impact as this primarily affects execution layer block validation and propagation."
+      },
+      "elClients": {
+        "impact": "Medium",
+        "description": "Need to implement block size validation logic and ensure block construction respects the new size limits."
+      }
     },
     "benefits": [
       "Prevents network instability from oversized blocks",
@@ -756,19 +1790,48 @@
       }
     ],
     "laymanDescription": "This restructures how gas costs work to prepare for stateless clients - nodes that can validate blocks without storing the entire blockchain state. The changes ensure gas costs accurately reflect the new computational model.",
-    "northStars": ["Scale L1"],
+    "northStars": [
+      "scaleL1"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "High", "description": "Essential foundation for stateless clients, which enable massive improvements in node syncing speed and storage requirements. Enables nodes to validate without storing full state." }
+      "scaleL1": {
+        "impact": "High",
+        "description": "Essential foundation for stateless clients, which enable massive improvements in node syncing speed and storage requirements. Enables nodes to validate without storing full state."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Low", "description": "Indirect benefits through improved network decentralization and faster node syncing, but gas cost changes may affect some transaction patterns." },
-      "appDevs": { "impact": "Medium", "description": "Some operations may have different gas costs, requiring optimization of smart contracts for the new stateless execution model." },
-      "walletDevs": { "impact": "Low", "description": "Need to update gas estimation for transactions affected by the new cost model, but most operations remain similar." },
-      "toolingInfra": { "impact": "High", "description": "Major updates needed for gas estimation, transaction simulation, and stateless proof generation. Block explorers need stateless verification capabilities." },
-      "layer2s": { "impact": "Medium", "description": "May need to adjust for new gas costs in settlement transactions and state access patterns." },
-      "stakersNodes": { "impact": "High", "description": "Can run much lighter nodes using stateless validation, dramatically reducing storage and syncing requirements while maintaining security." },
-      "clClients": { "impact": "Low", "description": "Minimal impact as this primarily affects execution layer gas metering and state access patterns." },
-      "elClients": { "impact": "High", "description": "Major implementation work required for new gas metering model, stateless execution environment, and witness data handling." }
+      "endUsers": {
+        "impact": "Low",
+        "description": "Indirect benefits through improved network decentralization and faster node syncing, but gas cost changes may affect some transaction patterns."
+      },
+      "appDevs": {
+        "impact": "Medium",
+        "description": "Some operations may have different gas costs, requiring optimization of smart contracts for the new stateless execution model."
+      },
+      "walletDevs": {
+        "impact": "Low",
+        "description": "Need to update gas estimation for transactions affected by the new cost model, but most operations remain similar."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "Major updates needed for gas estimation, transaction simulation, and stateless proof generation. Block explorers need stateless verification capabilities."
+      },
+      "layer2s": {
+        "impact": "Medium",
+        "description": "May need to adjust for new gas costs in settlement transactions and state access patterns."
+      },
+      "stakersNodes": {
+        "impact": "High",
+        "description": "Can run much lighter nodes using stateless validation, dramatically reducing storage and syncing requirements while maintaining security."
+      },
+      "clClients": {
+        "impact": "Low",
+        "description": "Minimal impact as this primarily affects execution layer gas metering and state access patterns."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Major implementation work required for new gas metering model, stateless execution environment, and witness data handling."
+      }
     },
     "benefits": [
       "Enables stateless client operation with dramatically faster sync",
@@ -794,20 +1857,53 @@
       }
     ],
     "laymanDescription": "This proposes transitioning Ethereum's entire state system from Merkle Patricia tries to Verkle trees. This foundational change would enable stateless clients, dramatically faster syncing, and better scalability while maintaining security. However, it's competing with other major proposals for Glamsterdam.",
-    "northStars": ["Scale L1", "Improve UX"],
+    "northStars": [
+      "scaleL1",
+      "improveUX"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "High", "description": "Revolutionary improvement to state management enabling stateless clients, faster state access, and much more efficient proof sizes. This is foundational infrastructure for long-term scaling." },
-      "improveUX": { "impact": "High", "description": "Enables instant node syncing through stateless operation, dramatically reducing barriers to running Ethereum infrastructure and improving decentralization." }
+      "scaleL1": {
+        "impact": "High",
+        "description": "Revolutionary improvement to state management enabling stateless clients, faster state access, and much more efficient proof sizes. This is foundational infrastructure for long-term scaling."
+      },
+      "improveUX": {
+        "impact": "High",
+        "description": "Enables instant node syncing through stateless operation, dramatically reducing barriers to running Ethereum infrastructure and improving decentralization."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "High", "description": "Revolutionary improvement in node syncing speed (from hours/days to minutes), better network decentralization, and more reliable access to Ethereum services." },
-      "appDevs": { "impact": "Medium", "description": "More efficient state access patterns and improved proof verification, though most smart contract logic remains unchanged." },
-      "walletDevs": { "impact": "Medium", "description": "Can implement much faster light clients and improve wallet syncing speed through stateless verification capabilities." },
-      "toolingInfra": { "impact": "High", "description": "Complete overhaul needed for state management, proof generation, indexing systems, and block explorers to handle Verkle tree proofs." },
-      "layer2s": { "impact": "Medium", "description": "More efficient state root verification and improved cross-chain proof mechanisms using Verkle tree cryptography." },
-      "stakersNodes": { "impact": "High", "description": "Can operate with dramatically reduced storage requirements and near-instant syncing through stateless validation, lowering barriers to participation." },
-      "clClients": { "impact": "Low", "description": "Minimal direct impact as this primarily affects execution layer state management and proof structures." },
-      "elClients": { "impact": "High", "description": "Complete state system rewrite required including Verkle tree implementation, state migration logic, and new proof generation/verification systems." }
+      "endUsers": {
+        "impact": "High",
+        "description": "Revolutionary improvement in node syncing speed (from hours/days to minutes), better network decentralization, and more reliable access to Ethereum services."
+      },
+      "appDevs": {
+        "impact": "Medium",
+        "description": "More efficient state access patterns and improved proof verification, though most smart contract logic remains unchanged."
+      },
+      "walletDevs": {
+        "impact": "Medium",
+        "description": "Can implement much faster light clients and improve wallet syncing speed through stateless verification capabilities."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "Complete overhaul needed for state management, proof generation, indexing systems, and block explorers to handle Verkle tree proofs."
+      },
+      "layer2s": {
+        "impact": "Medium",
+        "description": "More efficient state root verification and improved cross-chain proof mechanisms using Verkle tree cryptography."
+      },
+      "stakersNodes": {
+        "impact": "High",
+        "description": "Can operate with dramatically reduced storage requirements and near-instant syncing through stateless validation, lowering barriers to participation."
+      },
+      "clClients": {
+        "impact": "Low",
+        "description": "Minimal direct impact as this primarily affects execution layer state management and proof structures."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Complete state system rewrite required including Verkle tree implementation, state migration logic, and new proof generation/verification systems."
+      }
     },
     "benefits": [
       "Enables instant node syncing through stateless operation",
@@ -835,19 +1931,48 @@
       }
     ],
     "laymanDescription": "This ensures that the data needed to reconstruct Verkle tree proofs is properly preserved during the transition. It's a crucial technical requirement that maintains data availability while migrating to the new tree structure.",
-    "northStars": ["Scale L1"],
+    "northStars": [
+      "scaleL1"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "Medium", "description": "Essential infrastructure component for Verkle tree transition, ensuring data integrity and availability during the state system migration." }
+      "scaleL1": {
+        "impact": "Medium",
+        "description": "Essential infrastructure component for Verkle tree transition, ensuring data integrity and availability during the state system migration."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "None", "description": "No direct user-facing impact - this is purely infrastructure maintenance during the Verkle transition." },
-      "appDevs": { "impact": "None", "description": "No impact on smart contract development as this handles backend state management during migration." },
-      "walletDevs": { "impact": "None", "description": "No impact on wallet development as preimage retention is handled transparently by the protocol." },
-      "toolingInfra": { "impact": "Medium", "description": "Infrastructure providers need to understand preimage retention requirements for proper state reconstruction and proof generation." },
-      "layer2s": { "impact": "None", "description": "No direct impact on Layer 2 operations as this manages execution layer state transition details." },
-      "stakersNodes": { "impact": "Medium", "description": "Need to properly handle preimage data during the Verkle tree migration to maintain state verification capabilities." },
-      "clClients": { "impact": "None", "description": "No direct impact on consensus layer operations as this affects execution layer state management." },
-      "elClients": { "impact": "High", "description": "Must implement proper preimage retention mechanisms during state tree migration to ensure continuity of state verification." }
+      "endUsers": {
+        "impact": "None",
+        "description": "No direct user-facing impact - this is purely infrastructure maintenance during the Verkle transition."
+      },
+      "appDevs": {
+        "impact": "None",
+        "description": "No impact on smart contract development as this handles backend state management during migration."
+      },
+      "walletDevs": {
+        "impact": "None",
+        "description": "No impact on wallet development as preimage retention is handled transparently by the protocol."
+      },
+      "toolingInfra": {
+        "impact": "Medium",
+        "description": "Infrastructure providers need to understand preimage retention requirements for proper state reconstruction and proof generation."
+      },
+      "layer2s": {
+        "impact": "None",
+        "description": "No direct impact on Layer 2 operations as this manages execution layer state transition details."
+      },
+      "stakersNodes": {
+        "impact": "Medium",
+        "description": "Need to properly handle preimage data during the Verkle tree migration to maintain state verification capabilities."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No direct impact on consensus layer operations as this affects execution layer state management."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Must implement proper preimage retention mechanisms during state tree migration to ensure continuity of state verification."
+      }
     },
     "benefits": [
       "Ensures data integrity during Verkle tree transition",
@@ -873,24 +1998,57 @@
       }
     ],
     "laymanDescription": "This adds efficient built-in verification for Verkle tree cryptographic proofs. Instead of expensive smart contract computations, this precompile enables fast and cheap verification of the new proof system.",
-    "northStars": ["Scale L1", "Improve UX"],
+    "northStars": [
+      "scaleL1",
+      "improveUX"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "High", "description": "Essential for efficient Verkle tree proof verification within smart contracts, enabling advanced stateless applications and cross-chain verification." },
-      "improveUX": { "impact": "Medium", "description": "Enables new applications requiring state proof verification at much lower gas costs than pure smart contract implementations." }
+      "scaleL1": {
+        "impact": "High",
+        "description": "Essential for efficient Verkle tree proof verification within smart contracts, enabling advanced stateless applications and cross-chain verification."
+      },
+      "improveUX": {
+        "impact": "Medium",
+        "description": "Enables new applications requiring state proof verification at much lower gas costs than pure smart contract implementations."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Low", "description": "Benefits through cheaper applications that need to verify state proofs, enabling new use cases like efficient cross-chain bridges." },
-      "appDevs": { "impact": "High", "description": "Enables building applications that efficiently verify Verkle proofs, opening up new possibilities for cross-chain protocols and state-dependent applications." },
-      "walletDevs": { "impact": "Medium", "description": "Can implement more efficient state verification in light clients and improve cross-chain transaction validation." },
-      "toolingInfra": { "impact": "Medium", "description": "Infrastructure services can leverage efficient proof verification for state-dependent queries and cross-chain data verification." },
-      "layer2s": { "impact": "High", "description": "Critical for Layer 2 systems that need to verify L1 state efficiently, enabling better bridge security and state synchronization." },
-      "stakersNodes": { "impact": "Low", "description": "Indirect benefits through more efficient proof verification reducing overall network computational load." },
-      "clClients": { "impact": "None", "description": "No direct impact on consensus layer operations as this affects execution layer precompile functionality." },
-      "elClients": { "impact": "High", "description": "Must implement the Verkle proof verification precompile with proper gas accounting and cryptographic verification algorithms." }
+      "endUsers": {
+        "impact": "Low",
+        "description": "Benefits through cheaper applications that need to verify state proofs, enabling new use cases like efficient cross-chain bridges."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Enables building applications that efficiently verify Verkle proofs, opening up new possibilities for cross-chain protocols and state-dependent applications."
+      },
+      "walletDevs": {
+        "impact": "Medium",
+        "description": "Can implement more efficient state verification in light clients and improve cross-chain transaction validation."
+      },
+      "toolingInfra": {
+        "impact": "Medium",
+        "description": "Infrastructure services can leverage efficient proof verification for state-dependent queries and cross-chain data verification."
+      },
+      "layer2s": {
+        "impact": "High",
+        "description": "Critical for Layer 2 systems that need to verify L1 state efficiently, enabling better bridge security and state synchronization."
+      },
+      "stakersNodes": {
+        "impact": "Low",
+        "description": "Indirect benefits through more efficient proof verification reducing overall network computational load."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No direct impact on consensus layer operations as this affects execution layer precompile functionality."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Must implement the Verkle proof verification precompile with proper gas accounting and cryptographic verification algorithms."
+      }
     },
     "benefits": [
       "Enables cheap verification of Verkle proofs in smart contracts",
-      "Unlocks new cross-chain application possibilities", 
+      "Unlocks new cross-chain application possibilities",
       "Reduces gas costs for state proof verification",
       "Essential infrastructure for stateless applications"
     ]
@@ -912,19 +2070,48 @@
       }
     ],
     "laymanDescription": "This increases gas costs for hash operations to better reflect their computational cost in the Verkle tree environment. The adjustment ensures fair pricing as the protocol transitions to new cryptographic primitives.",
-    "northStars": ["Scale L1"],
+    "northStars": [
+      "scaleL1"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "Low", "description": "Ensures sustainable economics for hash operations in the Verkle tree environment and prevents potential DoS vectors from underpriced operations." }
+      "scaleL1": {
+        "impact": "Low",
+        "description": "Ensures sustainable economics for hash operations in the Verkle tree environment and prevents potential DoS vectors from underpriced operations."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Low", "description": "Most users unaffected, but hash-intensive applications may see slightly increased transaction costs." },
-      "appDevs": { "impact": "Medium", "description": "Applications using extensive hash operations (like Merkle tree verification) may need to optimize or budget for higher gas costs." },
-      "walletDevs": { "impact": "None", "description": "Minimal impact as wallets typically don't perform extensive hash operations directly." },
-      "toolingInfra": { "impact": "Low", "description": "Gas estimation tools need updates for the new hash function pricing, but changes are straightforward." },
-      "layer2s": { "impact": "Low", "description": "Layer 2 systems using hash-intensive operations may see increased costs for certain proof verification patterns." },
-      "stakersNodes": { "impact": "Low", "description": "Better compensation alignment for computational work performed during hash operations in the new environment." },
-      "clClients": { "impact": "None", "description": "No direct impact on consensus layer operations as this affects execution layer gas pricing." },
-      "elClients": { "impact": "Medium", "description": "Need to implement updated gas costs for hash functions with proper metering for the Verkle tree computational model." }
+      "endUsers": {
+        "impact": "Low",
+        "description": "Most users unaffected, but hash-intensive applications may see slightly increased transaction costs."
+      },
+      "appDevs": {
+        "impact": "Medium",
+        "description": "Applications using extensive hash operations (like Merkle tree verification) may need to optimize or budget for higher gas costs."
+      },
+      "walletDevs": {
+        "impact": "None",
+        "description": "Minimal impact as wallets typically don't perform extensive hash operations directly."
+      },
+      "toolingInfra": {
+        "impact": "Low",
+        "description": "Gas estimation tools need updates for the new hash function pricing, but changes are straightforward."
+      },
+      "layer2s": {
+        "impact": "Low",
+        "description": "Layer 2 systems using hash-intensive operations may see increased costs for certain proof verification patterns."
+      },
+      "stakersNodes": {
+        "impact": "Low",
+        "description": "Better compensation alignment for computational work performed during hash operations in the new environment."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No direct impact on consensus layer operations as this affects execution layer gas pricing."
+      },
+      "elClients": {
+        "impact": "Medium",
+        "description": "Need to implement updated gas costs for hash functions with proper metering for the Verkle tree computational model."
+      }
     },
     "benefits": [
       "Ensures fair pricing for hash operations",
@@ -954,20 +2141,53 @@
       }
     ],
     "laymanDescription": "This introduces smart transactions that only execute when specific conditions are met on-chain. Instead of failed transactions wasting gas, these transactions wait for the right conditions or don't execute at all.",
-    "northStars": ["Improve UX", "Scale L1"],
+    "northStars": [
+      "improveUX",
+      "scaleL1"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "Medium", "description": "Reduces wasted computation from failed transactions and enables more efficient transaction patterns that only execute when conditions are optimal." },
-      "improveUX": { "impact": "High", "description": "Dramatically improves user experience by eliminating failed transactions that waste gas, enabling more sophisticated automation and better transaction success rates." }
+      "scaleL1": {
+        "impact": "Medium",
+        "description": "Reduces wasted computation from failed transactions and enables more efficient transaction patterns that only execute when conditions are optimal."
+      },
+      "improveUX": {
+        "impact": "High",
+        "description": "Dramatically improves user experience by eliminating failed transactions that waste gas, enabling more sophisticated automation and better transaction success rates."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "High", "description": "Major improvement - no more paying gas for failed transactions. Enables setting up automated transactions that wait for optimal conditions." },
-      "appDevs": { "impact": "High", "description": "Enables building much more sophisticated automated applications with conditional logic, reducing complexity in smart contracts and improving reliability." },
-      "walletDevs": { "impact": "High", "description": "Can implement smart transaction features like \"execute when price reaches X\" or \"submit when gas is low\" improving user experience significantly." },
-      "toolingInfra": { "impact": "High", "description": "Transaction monitoring, mempool analysis, and automation tools need major updates to handle conditional transaction logic and execution patterns." },
-      "layer2s": { "impact": "Medium", "description": "Can implement more efficient settlement patterns and conditional execution logic in Layer 2 protocols." },
-      "stakersNodes": { "impact": "Medium", "description": "Reduced computational waste from failed transactions, though need to handle conditional transaction evaluation and storage." },
-      "clClients": { "impact": "None", "description": "No direct impact on consensus layer operations as this affects execution layer transaction processing." },
-      "elClients": { "impact": "High", "description": "Major implementation work required for conditional transaction evaluation, mempool management, and new transaction types with condition checking." }
+      "endUsers": {
+        "impact": "High",
+        "description": "Major improvement - no more paying gas for failed transactions. Enables setting up automated transactions that wait for optimal conditions."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Enables building much more sophisticated automated applications with conditional logic, reducing complexity in smart contracts and improving reliability."
+      },
+      "walletDevs": {
+        "impact": "High",
+        "description": "Can implement smart transaction features like \"execute when price reaches X\" or \"submit when gas is low\" improving user experience significantly."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "Transaction monitoring, mempool analysis, and automation tools need major updates to handle conditional transaction logic and execution patterns."
+      },
+      "layer2s": {
+        "impact": "Medium",
+        "description": "Can implement more efficient settlement patterns and conditional execution logic in Layer 2 protocols."
+      },
+      "stakersNodes": {
+        "impact": "Medium",
+        "description": "Reduced computational waste from failed transactions, though need to handle conditional transaction evaluation and storage."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No direct impact on consensus layer operations as this affects execution layer transaction processing."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Major implementation work required for conditional transaction evaluation, mempool management, and new transaction types with condition checking."
+      }
     },
     "benefits": [
       "Eliminates wasted gas from failed transactions",
@@ -997,19 +2217,48 @@
       }
     ],
     "laymanDescription": "This adds a simple but powerful new opcode that lets smart contracts know the current slot number (Ethereum's 12-second time unit). This enables precise time-based logic without relying on block timestamps.",
-    "northStars": ["Improve UX"],
+    "northStars": [
+      "improveUX"
+    ],
     "northStarAlignment": {
-      "improveUX": { "impact": "Medium", "description": "Enables more reliable time-based smart contracts and better coordination between consensus and execution layers." }
+      "improveUX": {
+        "impact": "Medium",
+        "description": "Enables more reliable time-based smart contracts and better coordination between consensus and execution layers."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Low", "description": "Indirect benefits through more reliable time-based applications like vesting contracts, auctions, and time-locked features." },
-      "appDevs": { "impact": "High", "description": "Provides precise, reliable timing mechanism for smart contracts, enabling better auction systems, vesting schedules, and time-dependent logic." },
-      "walletDevs": { "impact": "Low", "description": "Can implement more accurate time-based features and better estimation of when time-locked transactions will execute." },
-      "toolingInfra": { "impact": "Low", "description": "Development tools and debuggers need to support the new SLOTNUM opcode for smart contract development and testing." },
-      "layer2s": { "impact": "Low", "description": "Layer 2 systems can use more precise timing coordination with L1 consensus through slot number access." },
-      "stakersNodes": { "impact": "None", "description": "No impact on node operation as this is a simple opcode addition that returns existing consensus layer information." },
-      "clClients": { "impact": "Low", "description": "May need to expose slot number information to execution layer, but this is minimal coordination work." },
-      "elClients": { "impact": "Low", "description": "Simple implementation - just need to add the SLOTNUM opcode that returns the current consensus layer slot number." }
+      "endUsers": {
+        "impact": "Low",
+        "description": "Indirect benefits through more reliable time-based applications like vesting contracts, auctions, and time-locked features."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Provides precise, reliable timing mechanism for smart contracts, enabling better auction systems, vesting schedules, and time-dependent logic."
+      },
+      "walletDevs": {
+        "impact": "Low",
+        "description": "Can implement more accurate time-based features and better estimation of when time-locked transactions will execute."
+      },
+      "toolingInfra": {
+        "impact": "Low",
+        "description": "Development tools and debuggers need to support the new SLOTNUM opcode for smart contract development and testing."
+      },
+      "layer2s": {
+        "impact": "Low",
+        "description": "Layer 2 systems can use more precise timing coordination with L1 consensus through slot number access."
+      },
+      "stakersNodes": {
+        "impact": "None",
+        "description": "No impact on node operation as this is a simple opcode addition that returns existing consensus layer information."
+      },
+      "clClients": {
+        "impact": "Low",
+        "description": "May need to expose slot number information to execution layer, but this is minimal coordination work."
+      },
+      "elClients": {
+        "impact": "Low",
+        "description": "Simple implementation - just need to add the SLOTNUM opcode that returns the current consensus layer slot number."
+      }
     },
     "benefits": [
       "Enables precise time-based smart contract logic",
@@ -1041,26 +2290,63 @@
       }
     ],
     "laymanDescription": "Proposes the decoupling of the consensus block from the execution payload, both in broadcast and validation. This feature enables L1 scaling by significantly changing the time required to both broadcast and executing the payload together with all the blob data, from the current ~2 seconds to aproximately ~9 seconds. It allows for a maximum portion of the slot to be spent in propagation large data.",
-    "northStars": ["Scale L1", "Scale blobs", "Improve UX"],
+    "northStars": [
+      "scaleL1",
+      "scaleBlobs",
+      "improveUX"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "High", "description": "Enables for much larger payloads by removing the broadcast and the execution from the hot path of block validation." },
-      "scaleBlobs": { "impact": "Medium", "description": "Enables for much larger number of blobs by removing the broadcast and data availability sampling from the hot path of block validation." },
-      "improveUX": { "impact": "High", "description": "Second order effect of lower prices and higher tx throughput. Slight delay in minimal tx iclusion time from 0 to ~2 seconds." }
+      "scaleL1": {
+        "impact": "High",
+        "description": "Enables for much larger payloads by removing the broadcast and the execution from the hot path of block validation."
+      },
+      "scaleBlobs": {
+        "impact": "Medium",
+        "description": "Enables for much larger number of blobs by removing the broadcast and data availability sampling from the hot path of block validation."
+      },
+      "improveUX": {
+        "impact": "High",
+        "description": "Second order effect of lower prices and higher tx throughput. Slight delay in minimal tx iclusion time from 0 to ~2 seconds."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "High", "description": "Second order effect of lower prices and higher tx throughput." },
-      "appDevs": { "impact": "Medium", "description": "No direct impact. It enables applications to leverage previous builder information, something that is not currently available. It enables trustless preconfirmation schemes." },
-      "walletDevs": { "impact": "Medium", "description": "No direct impact. It enables wallets to send encrypted txs to anonymous builders." },
-      "toolingInfra": { "impact": "High", "description": "Explorers and block monitors need updates to handle the separation of the beacon block from the payload." },
-      "layer2s": { "impact": "Medium", "description": "Second order effect of higher blob count being possible." },
-      "stakersNodes": { "impact": "High", "description": "Major changes and updates are needed for trustless monitoring in staking pools. Staking UX is improved by a refined builder picking and monitoring." },
-      "clClients": { "impact": "High", "description": "Major changes for CL clients" },
-      "elClients": { "impact": "High", "description": "No changes for EL clients." }
+      "endUsers": {
+        "impact": "High",
+        "description": "Second order effect of lower prices and higher tx throughput."
+      },
+      "appDevs": {
+        "impact": "Medium",
+        "description": "No direct impact. It enables applications to leverage previous builder information, something that is not currently available. It enables trustless preconfirmation schemes."
+      },
+      "walletDevs": {
+        "impact": "Medium",
+        "description": "No direct impact. It enables wallets to send encrypted txs to anonymous builders."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "Explorers and block monitors need updates to handle the separation of the beacon block from the payload."
+      },
+      "layer2s": {
+        "impact": "Medium",
+        "description": "Second order effect of higher blob count being possible."
+      },
+      "stakersNodes": {
+        "impact": "High",
+        "description": "Major changes and updates are needed for trustless monitoring in staking pools. Staking UX is improved by a refined builder picking and monitoring."
+      },
+      "clClients": {
+        "impact": "High",
+        "description": "Major changes for CL clients"
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "No changes for EL clients."
+      }
     },
     "benefits": [
       "Better slot utilization getting close to 100% utilization for broadcasting + execution",
       "Removal of most of the heavy work from the hot path of block validation.",
-      "Removal of trust assumptions for proposers and builders.", 
+      "Removal of trust assumptions for proposers and builders.",
       "Removal of trust assumptions on off-protocol closed source software."
     ]
   },
@@ -1083,20 +2369,53 @@
       }
     ],
     "laymanDescription": "This reduces Ethereum's slot time from 12 seconds to 6 seconds, making Ethereum a better confirmation engine for apps and rollups. Everyone benefits: users get faster confirmations with better censorship resistance, DeFi gets more efficient trading with lower fees, stakers get lower reward variability, and nodes get better resource utilization with smoother bandwidth usage.",
-    "northStars": ["Improve UX", "Scale L1"],
+    "northStars": [
+      "improveUX",
+      "scaleL1"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "High", "description": "Makes Ethereum a superior confirmation engine by doubling proposer frequency while maintaining throughput. Improves censorship resistance through 2x more proposers per unit time." },
-      "improveUX": { "impact": "High", "description": "Wallets display fresher data with 6-second confirmations. DeFi exchanges become more efficient with frequent price updates, reducing arbitrage losses and attracting more liquidity." }
+      "scaleL1": {
+        "impact": "High",
+        "description": "Makes Ethereum a superior confirmation engine by doubling proposer frequency while maintaining throughput. Improves censorship resistance through 2x more proposers per unit time."
+      },
+      "improveUX": {
+        "impact": "High",
+        "description": "Wallets display fresher data with 6-second confirmations. DeFi exchanges become more efficient with frequent price updates, reducing arbitrage losses and attracting more liquidity."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "High", "description": "Transaction confirmations in 3 seconds (on average) instead of 6, with better censorship resistance from 2x more proposers per second. DeFi users enjoy lower trading fees and reduced slippage from more efficient exchanges with frequent price updates." },
-      "appDevs": { "impact": "High", "description": "Can build more responsive applications with frequent data triggers reducing staleness. DeFi protocols benefit from tighter spreads, reduced arbitrage losses, and flywheel effects attracting more liquidity and traders." },
-      "walletDevs": { "impact": "High", "description": "Can display fresher chain data following transaction inclusion with 6-second head updates. Need to update timing assumptions but deliver significantly improved user responsiveness." },
-      "toolingInfra": { "impact": "High", "description": "Block explorers and infrastructure need conditional logic for slot times to handle historical 12s blocks and new 6s blocks. Must implement millisecond-precision timing instead of seconds." },
-      "layer2s": { "impact": "High", "description": "Receive L1 finality, safe confirmations, and block inclusion all twice as fast. Based rollups see their sequencing clock move twice as fast. Interoperability protocols get quicker actionable signals." },
-      "stakersNodes": { "impact": "High", "description": "Lower reward variability from smaller, more frequent rewards reducing pooling incentives. Better resource utilization with smoother bandwidth usage, but must handle doubled consensus message frequency and new subslot timing (3s/1.5s/1.5s)." },
-      "clClients": { "impact": "High", "description": "Major implementation for conditional slot timing logic, new subslot schedules (3s block proposal, 1.5s attestations, 1.5s aggregation), and doubled consensus message processing while maintaining validator participation." },
-      "elClients": { "impact": "Medium", "description": "Gas limit votes halved to maintain \"gas per 12 seconds\" throughput semantics. Blob targets and limits halved. May need investigation of contracts assuming fixed 12-second slot times." }
+      "endUsers": {
+        "impact": "High",
+        "description": "Transaction confirmations in 3 seconds (on average) instead of 6, with better censorship resistance from 2x more proposers per second. DeFi users enjoy lower trading fees and reduced slippage from more efficient exchanges with frequent price updates."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Can build more responsive applications with frequent data triggers reducing staleness. DeFi protocols benefit from tighter spreads, reduced arbitrage losses, and flywheel effects attracting more liquidity and traders."
+      },
+      "walletDevs": {
+        "impact": "High",
+        "description": "Can display fresher chain data following transaction inclusion with 6-second head updates. Need to update timing assumptions but deliver significantly improved user responsiveness."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "Block explorers and infrastructure need conditional logic for slot times to handle historical 12s blocks and new 6s blocks. Must implement millisecond-precision timing instead of seconds."
+      },
+      "layer2s": {
+        "impact": "High",
+        "description": "Receive L1 finality, safe confirmations, and block inclusion all twice as fast. Based rollups see their sequencing clock move twice as fast. Interoperability protocols get quicker actionable signals."
+      },
+      "stakersNodes": {
+        "impact": "High",
+        "description": "Lower reward variability from smaller, more frequent rewards reducing pooling incentives. Better resource utilization with smoother bandwidth usage, but must handle doubled consensus message frequency and new subslot timing (3s/1.5s/1.5s)."
+      },
+      "clClients": {
+        "impact": "High",
+        "description": "Major implementation for conditional slot timing logic, new subslot schedules (3s block proposal, 1.5s attestations, 1.5s aggregation), and doubled consensus message processing while maintaining validator participation."
+      },
+      "elClients": {
+        "impact": "Medium",
+        "description": "Gas limit votes halved to maintain \"gas per 12 seconds\" throughput semantics. Blob targets and limits halved. May need investigation of contracts assuming fixed 12-second slot times."
+      }
     },
     "benefits": [
       "Halves transaction confirmation time from maximum 12s to maximum 6s with better censorship resistance",
@@ -1128,20 +2447,53 @@
       }
     ],
     "laymanDescription": "This is the core EIP of the EVM64 collection, introducing 64-bit arithmetic operations to the EVM. The full EVM64 suite includes multiple EIPs enabling much more efficient mathematical computations by adding 64-bit operations alongside existing 256-bit ones.",
-    "northStars": ["Scale L1", "Improve UX"],
+    "northStars": [
+      "scaleL1",
+      "improveUX"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "Medium", "description": "Significantly improves computational efficiency for mathematical operations, reducing gas costs and enabling more complex on-chain calculations." },
-      "improveUX": { "impact": "Medium", "description": "Cheaper and faster mathematical operations enable more sophisticated on-chain applications and reduce gas costs for computation-heavy smart contracts." }
+      "scaleL1": {
+        "impact": "Medium",
+        "description": "Significantly improves computational efficiency for mathematical operations, reducing gas costs and enabling more complex on-chain calculations."
+      },
+      "improveUX": {
+        "impact": "Medium",
+        "description": "Cheaper and faster mathematical operations enable more sophisticated on-chain applications and reduce gas costs for computation-heavy smart contracts."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Medium", "description": "Lower gas costs for applications requiring mathematical computations like DeFi protocols, gaming, and scientific applications." },
-      "appDevs": { "impact": "High", "description": "Can build much more efficient mathematical applications, implement better algorithms on-chain, and reduce gas costs for computation-intensive smart contracts." },
-      "walletDevs": { "impact": "Low", "description": "Indirect benefits through lower gas costs for mathematical operations in wallet-related smart contracts." },
-      "toolingInfra": { "impact": "Medium", "description": "Development tools, debuggers, and gas estimation systems need updates to support 64-bit operations and their gas costs." },
-      "layer2s": { "impact": "Medium", "description": "More efficient mathematical operations benefit Layer 2 proof generation and verification systems." },
-      "stakersNodes": { "impact": "Low", "description": "More efficient computation reduces overall network computational load for mathematical operations." },
-      "clClients": { "impact": "None", "description": "No direct impact on consensus layer operations as this affects execution layer computational capabilities." },
-      "elClients": { "impact": "High", "description": "Major implementation work required for new 64-bit opcodes, proper gas accounting, and ensuring compatibility with existing 256-bit operations." }
+      "endUsers": {
+        "impact": "Medium",
+        "description": "Lower gas costs for applications requiring mathematical computations like DeFi protocols, gaming, and scientific applications."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Can build much more efficient mathematical applications, implement better algorithms on-chain, and reduce gas costs for computation-intensive smart contracts."
+      },
+      "walletDevs": {
+        "impact": "Low",
+        "description": "Indirect benefits through lower gas costs for mathematical operations in wallet-related smart contracts."
+      },
+      "toolingInfra": {
+        "impact": "Medium",
+        "description": "Development tools, debuggers, and gas estimation systems need updates to support 64-bit operations and their gas costs."
+      },
+      "layer2s": {
+        "impact": "Medium",
+        "description": "More efficient mathematical operations benefit Layer 2 proof generation and verification systems."
+      },
+      "stakersNodes": {
+        "impact": "Low",
+        "description": "More efficient computation reduces overall network computational load for mathematical operations."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No direct impact on consensus layer operations as this affects execution layer computational capabilities."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Major implementation work required for new 64-bit opcodes, proper gas accounting, and ensuring compatibility with existing 256-bit operations."
+      }
     },
     "benefits": [
       "Dramatically reduces gas costs for mathematical operations",
@@ -1173,20 +2525,53 @@
       }
     ],
     "laymanDescription": "This enables Ethereum nodes to provide cryptographic proofs with their responses, eliminating the need to trust RPC providers. Users can verify that data from any source is authentic without running their own full node.",
-    "northStars": ["Improve UX", "Scale L1"],
+    "northStars": [
+      "improveUX",
+      "scaleL1"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "Medium", "description": "Improves network decentralization by reducing reliance on trusted RPC providers and enabling more efficient light client verification." },
-      "improveUX": { "impact": "High", "description": "Eliminates trust requirements for data access, enables secure light clients, and dramatically improves decentralization of the application ecosystem." }
+      "scaleL1": {
+        "impact": "Medium",
+        "description": "Improves network decentralization by reducing reliance on trusted RPC providers and enabling more efficient light client verification."
+      },
+      "improveUX": {
+        "impact": "High",
+        "description": "Eliminates trust requirements for data access, enables secure light clients, and dramatically improves decentralization of the application ecosystem."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "High", "description": "Can use any RPC provider securely without trust, access verified blockchain data from lightweight applications, and reduced dependence on centralized services." },
-      "appDevs": { "impact": "High", "description": "Can build truly decentralized applications without requiring users to run full nodes, implement secure light clients, and verify data from any source." },
-      "walletDevs": { "impact": "High", "description": "Can implement secure light wallets that verify all data cryptographically, reducing infrastructure costs while maintaining security guarantees." },
-      "toolingInfra": { "impact": "High", "description": "RPC providers need major updates to support proof generation, block explorers can provide verifiable data, and new verification tooling needs development." },
-      "layer2s": { "impact": "Medium", "description": "Can implement more secure light clients for Layer 2 networks and improve cross-chain data verification mechanisms." },
-      "stakersNodes": { "impact": "Medium", "description": "Need to generate cryptographic proofs for data responses, though this enables lighter infrastructure for many use cases." },
-      "clClients": { "impact": "Low", "description": "May need some coordination for proof generation, but this primarily affects execution layer data structures." },
-      "elClients": { "impact": "High", "description": "Major implementation work required for proof generation systems, new data structures, and RPC response verification mechanisms." }
+      "endUsers": {
+        "impact": "High",
+        "description": "Can use any RPC provider securely without trust, access verified blockchain data from lightweight applications, and reduced dependence on centralized services."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Can build truly decentralized applications without requiring users to run full nodes, implement secure light clients, and verify data from any source."
+      },
+      "walletDevs": {
+        "impact": "High",
+        "description": "Can implement secure light wallets that verify all data cryptographically, reducing infrastructure costs while maintaining security guarantees."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "RPC providers need major updates to support proof generation, block explorers can provide verifiable data, and new verification tooling needs development."
+      },
+      "layer2s": {
+        "impact": "Medium",
+        "description": "Can implement more secure light clients for Layer 2 networks and improve cross-chain data verification mechanisms."
+      },
+      "stakersNodes": {
+        "impact": "Medium",
+        "description": "Need to generate cryptographic proofs for data responses, though this enables lighter infrastructure for many use cases."
+      },
+      "clClients": {
+        "impact": "Low",
+        "description": "May need some coordination for proof generation, but this primarily affects execution layer data structures."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Major implementation work required for proof generation systems, new data structures, and RPC response verification mechanisms."
+      }
     },
     "benefits": [
       "Eliminates need to trust RPC providers",
@@ -1214,20 +2599,53 @@
       }
     ],
     "laymanDescription": "This is a comprehensive solution to eliminate all known reorganization attacks on Ethereum. Instead of fixing attacks one-by-one, Available Attestation redesigns how consensus works to make reorg attacks fundamentally impossible.",
-    "northStars": ["Scale L1", "Improve UX"],
+    "northStars": [
+      "scaleL1",
+      "improveUX"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "High", "description": "Eliminates all known reorg attacks, dramatically improving network security and enabling more aggressive scaling optimizations without security trade-offs." },
-      "improveUX": { "impact": "High", "description": "Eliminates transaction reordering attacks, provides guaranteed inclusion properties, and dramatically improves user confidence in transaction finality." }
+      "scaleL1": {
+        "impact": "High",
+        "description": "Eliminates all known reorg attacks, dramatically improving network security and enabling more aggressive scaling optimizations without security trade-offs."
+      },
+      "improveUX": {
+        "impact": "High",
+        "description": "Eliminates transaction reordering attacks, provides guaranteed inclusion properties, and dramatically improves user confidence in transaction finality."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "High", "description": "Eliminates the possibility of transaction censorship and reorg attacks, providing guaranteed transaction inclusion and much stronger finality guarantees." },
-      "appDevs": { "impact": "High", "description": "Can build applications with stronger security assumptions, eliminate MEV-related edge cases, and provide users with guaranteed transaction execution properties." },
-      "walletDevs": { "impact": "Medium", "description": "Can provide stronger transaction finality guarantees and eliminate concerns about transaction reordering after inclusion." },
-      "toolingInfra": { "impact": "High", "description": "Major updates needed for consensus monitoring, reorg detection systems, and fork choice analysis tools to handle the new attestation mechanisms." },
-      "layer2s": { "impact": "High", "description": "Dramatically improves bridge security by eliminating L1 reorg risks and enables more aggressive optimization of settlement mechanisms." },
-      "stakersNodes": { "impact": "High", "description": "Fundamental changes to attestation behavior and fork choice logic, but eliminates complex reorg-related edge cases in validator operations." },
-      "clClients": { "impact": "High", "description": "Major implementation work required for new attestation mechanisms, modified fork choice logic, and consensus layer protocol changes." },
-      "elClients": { "impact": "Medium", "description": "Need to coordinate with new consensus mechanisms but most changes are in the consensus layer attestation logic." }
+      "endUsers": {
+        "impact": "High",
+        "description": "Eliminates the possibility of transaction censorship and reorg attacks, providing guaranteed transaction inclusion and much stronger finality guarantees."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Can build applications with stronger security assumptions, eliminate MEV-related edge cases, and provide users with guaranteed transaction execution properties."
+      },
+      "walletDevs": {
+        "impact": "Medium",
+        "description": "Can provide stronger transaction finality guarantees and eliminate concerns about transaction reordering after inclusion."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "Major updates needed for consensus monitoring, reorg detection systems, and fork choice analysis tools to handle the new attestation mechanisms."
+      },
+      "layer2s": {
+        "impact": "High",
+        "description": "Dramatically improves bridge security by eliminating L1 reorg risks and enables more aggressive optimization of settlement mechanisms."
+      },
+      "stakersNodes": {
+        "impact": "High",
+        "description": "Fundamental changes to attestation behavior and fork choice logic, but eliminates complex reorg-related edge cases in validator operations."
+      },
+      "clClients": {
+        "impact": "High",
+        "description": "Major implementation work required for new attestation mechanisms, modified fork choice logic, and consensus layer protocol changes."
+      },
+      "elClients": {
+        "impact": "Medium",
+        "description": "Need to coordinate with new consensus mechanisms but most changes are in the consensus layer attestation logic."
+      }
     },
     "benefits": [
       "Eliminates all known reorganization attacks permanently",
@@ -1255,19 +2673,48 @@
       }
     ],
     "laymanDescription": "This introduces a delay between when transactions are committed and when they're executed, reducing MEV extraction and front-running while improving transaction ordering fairness.",
-    "northStars": ["Scale L1"],
+    "northStars": [
+      "scaleL1"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "Medium", "description": "Improves transaction ordering efficiency and reduces MEV-driven congestion, enabling more predictable block space utilization." }
+      "scaleL1": {
+        "impact": "Medium",
+        "description": "Improves transaction ordering efficiency and reduces MEV-driven congestion, enabling more predictable block space utilization."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "High", "description": "Protection from front-running attacks, more fair transaction ordering, and reduced MEV tax on transactions leading to better execution prices." },
-      "appDevs": { "impact": "High", "description": "Can build applications with stronger ordering guarantees, reduced MEV concerns, and more predictable execution environments." },
-      "walletDevs": { "impact": "Medium", "description": "Need to handle delayed execution in transaction flow but can provide better protection from front-running for users." },
-      "toolingInfra": { "impact": "High", "description": "MEV analysis tools, transaction simulation, and ordering analysis systems need major updates to handle delayed execution patterns." },
-      "layer2s": { "impact": "Medium", "description": "More predictable L1 execution environment benefits Layer 2 settlement and reduces MEV impact on cross-layer transactions." },
-      "stakersNodes": { "impact": "Medium", "description": "Need to handle the new delayed execution model in block production and transaction ordering mechanisms." },
-      "clClients": { "impact": "Low", "description": "Minimal impact as this primarily affects execution layer transaction processing and ordering." },
-      "elClients": { "impact": "High", "description": "Major implementation work required for delayed execution mechanisms, new transaction lifecycle management, and ordering protocols." }
+      "endUsers": {
+        "impact": "High",
+        "description": "Protection from front-running attacks, more fair transaction ordering, and reduced MEV tax on transactions leading to better execution prices."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Can build applications with stronger ordering guarantees, reduced MEV concerns, and more predictable execution environments."
+      },
+      "walletDevs": {
+        "impact": "Medium",
+        "description": "Need to handle delayed execution in transaction flow but can provide better protection from front-running for users."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "MEV analysis tools, transaction simulation, and ordering analysis systems need major updates to handle delayed execution patterns."
+      },
+      "layer2s": {
+        "impact": "Medium",
+        "description": "More predictable L1 execution environment benefits Layer 2 settlement and reduces MEV impact on cross-layer transactions."
+      },
+      "stakersNodes": {
+        "impact": "Medium",
+        "description": "Need to handle the new delayed execution model in block production and transaction ordering mechanisms."
+      },
+      "clClients": {
+        "impact": "Low",
+        "description": "Minimal impact as this primarily affects execution layer transaction processing and ordering."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Major implementation work required for delayed execution mechanisms, new transaction lifecycle management, and ordering protocols."
+      }
     },
     "benefits": [
       "Reduces front-running and MEV extraction significantly",
@@ -1295,20 +2742,53 @@
       }
     ],
     "laymanDescription": "This introduces access lists at the block level rather than individual transactions, dramatically reducing gas costs for applications that access similar state and enabling new optimization patterns.",
-    "northStars": ["Scale L1", "Improve UX"],
+    "northStars": [
+      "scaleL1",
+      "improveUX"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "Medium", "description": "Significantly reduces gas costs for state access through block-level optimization, improving overall network efficiency and throughput." },
-      "improveUX": { "impact": "Medium", "description": "Lower gas costs for complex applications and improved predictability for applications with similar state access patterns." }
+      "scaleL1": {
+        "impact": "Medium",
+        "description": "Significantly reduces gas costs for state access through block-level optimization, improving overall network efficiency and throughput."
+      },
+      "improveUX": {
+        "impact": "Medium",
+        "description": "Lower gas costs for complex applications and improved predictability for applications with similar state access patterns."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Medium", "description": "Lower gas costs for complex applications, especially DeFi protocols and applications that access similar state across multiple transactions." },
-      "appDevs": { "impact": "High", "description": "Can optimize applications for block-level access patterns, significantly reduce gas costs for state-heavy applications, and enable new design patterns." },
-      "walletDevs": { "impact": "Low", "description": "Indirect benefits through lower gas costs for applications, but minimal direct impact on wallet development." },
-      "toolingInfra": { "impact": "Medium", "description": "Gas estimation tools, transaction simulation, and optimization analysis need updates to handle block-level access list patterns." },
-      "layer2s": { "impact": "Low", "description": "More efficient state access in Layer 2 settlement transactions and optimized bridge operations." },
-      "stakersNodes": { "impact": "Low", "description": "More efficient block processing due to optimized state access patterns, reducing computational overhead." },
-      "clClients": { "impact": "None", "description": "No direct impact on consensus layer operations as this affects execution layer state access optimization." },
-      "elClients": { "impact": "High", "description": "Significant implementation work required for block-level access list management, state access optimization, and gas accounting updates." }
+      "endUsers": {
+        "impact": "Medium",
+        "description": "Lower gas costs for complex applications, especially DeFi protocols and applications that access similar state across multiple transactions."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Can optimize applications for block-level access patterns, significantly reduce gas costs for state-heavy applications, and enable new design patterns."
+      },
+      "walletDevs": {
+        "impact": "Low",
+        "description": "Indirect benefits through lower gas costs for applications, but minimal direct impact on wallet development."
+      },
+      "toolingInfra": {
+        "impact": "Medium",
+        "description": "Gas estimation tools, transaction simulation, and optimization analysis need updates to handle block-level access list patterns."
+      },
+      "layer2s": {
+        "impact": "Low",
+        "description": "More efficient state access in Layer 2 settlement transactions and optimized bridge operations."
+      },
+      "stakersNodes": {
+        "impact": "Low",
+        "description": "More efficient block processing due to optimized state access patterns, reducing computational overhead."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No direct impact on consensus layer operations as this affects execution layer state access optimization."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Significant implementation work required for block-level access list management, state access optimization, and gas accounting updates."
+      }
     },
     "benefits": [
       "Dramatically reduces gas costs for state-heavy applications",
@@ -1340,21 +2820,58 @@
       }
     ],
     "laymanDescription": "FOCIL empowers multiple validators to mandate the inclusion of specific transactions in each block, thereby improving the network's censorship resistance properties.",
-    "northStars": ["Improve UX", "Scale L1", "Scale blobs"],
+    "northStars": [
+      "improveUX",
+      "scaleL1",
+      "scaleBlobs"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "Medium", "description": "Ethereum currently relies on local block builders to preserve censorship resistance. However, depending on local block builders comes at a cost to performance and incentives, which may conflict with scaling throughput. FOCIL is crucial in L1 scaling because it helps decouple local block building from censorship resistance." },
-      "scaleBlobs": { "impact": "Low", "description": "A more censorship-resistant L1 provides better foundation for Layer 2 settlement guarantees, and allows to shorten the exit time window for optimistic rollups." },
-      "improveUX": { "impact": "High", "description": "Provides strong guarantees against transaction censorship and ensures fair access to block space for all users regardless of transaction content." }
+      "scaleL1": {
+        "impact": "Medium",
+        "description": "Ethereum currently relies on local block builders to preserve censorship resistance. However, depending on local block builders comes at a cost to performance and incentives, which may conflict with scaling throughput. FOCIL is crucial in L1 scaling because it helps decouple local block building from censorship resistance."
+      },
+      "scaleBlobs": {
+        "impact": "Low",
+        "description": "A more censorship-resistant L1 provides better foundation for Layer 2 settlement guarantees, and allows to shorten the exit time window for optimistic rollups."
+      },
+      "improveUX": {
+        "impact": "High",
+        "description": "Provides strong guarantees against transaction censorship and ensures fair access to block space for all users regardless of transaction content."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "High", "description": "Strong protection against transaction censorship for all end users, guaranteed inclusion for valid transactions, and improved confidence in Ethereum's credible neutrality." },
-      "appDevs": { "impact": "Medium", "description": "Can build applications with stronger inclusion guarantees and reduced concerns about application-specific censorship." },
-      "walletDevs": { "impact": "Medium", "description": "Can provide users with stronger transaction inclusion guarantees and better protection against selective censorship." },
-      "toolingInfra": { "impact": "High", "description": "Censorship monitoring tools, inclusion list analysis, and validator behavior tracking systems need major updates after FOCIL implementation." },
-      "layer2s": { "impact": "Medium", "description": "More censorship-resistant L1 settlement provides stronger guarantees for Layer 2 transaction processing, bridge operations, and reduces rollup challenge period risks." },
-      "stakersNodes": { "impact": "High", "description": "Validators must now build inclusion lists according to the protocol rules, and attesters must enforce inclusion lists conditions are satisfied before voting for a block." },
-      "clClients": { "impact": "High", "description": "Major implementation work required for inclusion lists propagation and enforcement, including fork-choice modifications." },
-      "elClients": { "impact": "Medium", "description": "Need build inclusion lists, to update the execution payload with inclusion list transactions, and communicate with the consensus layer." }
+      "endUsers": {
+        "impact": "High",
+        "description": "Strong protection against transaction censorship for all end users, guaranteed inclusion for valid transactions, and improved confidence in Ethereum's credible neutrality."
+      },
+      "appDevs": {
+        "impact": "Medium",
+        "description": "Can build applications with stronger inclusion guarantees and reduced concerns about application-specific censorship."
+      },
+      "walletDevs": {
+        "impact": "Medium",
+        "description": "Can provide users with stronger transaction inclusion guarantees and better protection against selective censorship."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "Censorship monitoring tools, inclusion list analysis, and validator behavior tracking systems need major updates after FOCIL implementation."
+      },
+      "layer2s": {
+        "impact": "Medium",
+        "description": "More censorship-resistant L1 settlement provides stronger guarantees for Layer 2 transaction processing, bridge operations, and reduces rollup challenge period risks."
+      },
+      "stakersNodes": {
+        "impact": "High",
+        "description": "Validators must now build inclusion lists according to the protocol rules, and attesters must enforce inclusion lists conditions are satisfied before voting for a block."
+      },
+      "clClients": {
+        "impact": "High",
+        "description": "Major implementation work required for inclusion lists propagation and enforcement, including fork-choice modifications."
+      },
+      "elClients": {
+        "impact": "Medium",
+        "description": "Need build inclusion lists, to update the execution payload with inclusion list transactions, and communicate with the consensus layer."
+      }
     },
     "benefits": [
       "Provides strong censorship resistance guarantees",
@@ -1385,20 +2902,53 @@
       }
     ],
     "laymanDescription": "This introduces a new container format for EVM bytecode that enables code versioning, removes complex jump analysis, and paves the way for new execution environments like RISC-V and EVM64 within the same contract. This EIP was Declined for Inclusion from Fusaka on [April 28th](https://blog.ethereum.org/2025/04/29/checkpoint-2#eof) due to a lack of consensus on implementation details and the resulting potential slowdown of shipping PeerDAS. It has been re-proposed as a headlining feature in Glamsterdam with multiple variants to address community concerns.",
-    "northStars": ["Scale L1", "Improve UX"],
+    "northStars": [
+      "scaleL1",
+      "improveUX"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "High", "description": "Enables incremental deployment of more efficient execution environments like RISC-V and EVM64 for computationally intensive tasks while maintaining EVM compatibility. Removes JUMPDEST analysis overhead." },
-      "improveUX": { "impact": "Medium", "description": "Provides better developer tools through improved code analysis, versioning capabilities, and performance improvements for computationally intensive applications." }
+      "scaleL1": {
+        "impact": "High",
+        "description": "Enables incremental deployment of more efficient execution environments like RISC-V and EVM64 for computationally intensive tasks while maintaining EVM compatibility. Removes JUMPDEST analysis overhead."
+      },
+      "improveUX": {
+        "impact": "Medium",
+        "description": "Provides better developer tools through improved code analysis, versioning capabilities, and performance improvements for computationally intensive applications."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Medium", "description": "Indirect benefits from improved contract performance and reduced gas costs for computationally intensive operations. Better reliability from enhanced code validation." },
-      "appDevs": { "impact": "High", "description": "Can use multiple execution environments within same contract - write normal logic in EVM and intensive computations in EVM64/RISC-V. Better code analysis tools and function support improve development experience." },
-      "walletDevs": { "impact": "Low", "description": "Minimal direct impact on wallet development, though improved contract reliability and performance benefit user experience indirectly." },
-      "toolingInfra": { "impact": "High", "description": "Major updates needed for debuggers, analyzers, and development tools to support EOF containers, multiple execution environments, and new bytecode format. Better analysis capabilities once implemented." },
-      "layer2s": { "impact": "Medium", "description": "Can leverage more efficient execution environments for proof generation and validation. Better code analysis aids in rollup optimization and security verification." },
-      "stakersNodes": { "impact": "Medium", "description": "Reduced computational overhead from eliminating JUMPDEST analysis. Potential increased complexity from supporting multiple execution environments within contracts." },
-      "clClients": { "impact": "Low", "description": "Minimal direct impact on consensus layer operations as this primarily affects execution layer bytecode processing and validation." },
-      "elClients": { "impact": "High", "description": "Major implementation work for new bytecode container format, multiple execution environments, enhanced validation, and maintaining backwards compatibility with legacy bytecode." }
+      "endUsers": {
+        "impact": "Medium",
+        "description": "Indirect benefits from improved contract performance and reduced gas costs for computationally intensive operations. Better reliability from enhanced code validation."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Can use multiple execution environments within same contract - write normal logic in EVM and intensive computations in EVM64/RISC-V. Better code analysis tools and function support improve development experience."
+      },
+      "walletDevs": {
+        "impact": "Low",
+        "description": "Minimal direct impact on wallet development, though improved contract reliability and performance benefit user experience indirectly."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "Major updates needed for debuggers, analyzers, and development tools to support EOF containers, multiple execution environments, and new bytecode format. Better analysis capabilities once implemented."
+      },
+      "layer2s": {
+        "impact": "Medium",
+        "description": "Can leverage more efficient execution environments for proof generation and validation. Better code analysis aids in rollup optimization and security verification."
+      },
+      "stakersNodes": {
+        "impact": "Medium",
+        "description": "Reduced computational overhead from eliminating JUMPDEST analysis. Potential increased complexity from supporting multiple execution environments within contracts."
+      },
+      "clClients": {
+        "impact": "Low",
+        "description": "Minimal direct impact on consensus layer operations as this primarily affects execution layer bytecode processing and validation."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Major implementation work for new bytecode container format, multiple execution environments, enhanced validation, and maintaining backwards compatibility with legacy bytecode."
+      }
     },
     "benefits": [
       "Enables incremental adoption of RISC-V and EVM64 within existing contracts",
@@ -1428,20 +2978,53 @@
       }
     ],
     "laymanDescription": "This adds a new CLZ (Count Leading Zeros) opcode to the EVM that efficiently counts the number of zero bits at the start of a 256-bit number. This is a fundamental mathematical operation used in many algorithms, especially for mathematical computations, data compression, and cryptographic operations. Currently, implementing this operation in Solidity requires complex and expensive code - this opcode makes it much cheaper and faster.",
-    "northStars": ["Scale L1", "Improve UX"],
+    "northStars": [
+      "scaleL1",
+      "improveUX"
+    ],
     "northStarAlignment": {
-      "scaleL1": { "impact": "Medium", "description": "Significantly reduces gas costs for mathematical operations that require bit manipulation, improving computational efficiency and enabling more complex on-chain calculations." },
-      "improveUX": { "impact": "Medium", "description": "Enables cheaper and more efficient mathematical operations, benefiting DeFi protocols, gaming applications, and any contracts requiring complex mathematical computations." }
+      "scaleL1": {
+        "impact": "Medium",
+        "description": "Significantly reduces gas costs for mathematical operations that require bit manipulation, improving computational efficiency and enabling more complex on-chain calculations."
+      },
+      "improveUX": {
+        "impact": "Medium",
+        "description": "Enables cheaper and more efficient mathematical operations, benefiting DeFi protocols, gaming applications, and any contracts requiring complex mathematical computations."
+      }
     },
     "stakeholderImpacts": {
-      "endUsers": { "impact": "Low", "description": "Indirect benefits through lower gas costs for applications using mathematical operations, compression algorithms, and advanced cryptographic schemes." },
-      "appDevs": { "impact": "High", "description": "Can implement much more efficient mathematical algorithms, compression schemes, and bitmap operations. Particularly beneficial for DeFi protocols requiring complex mathematical operations and ZK-proving applications." },
-      "walletDevs": { "impact": "Low", "description": "Minimal direct impact, though benefits indirectly from more efficient mathematical operations in smart contracts." },
-      "toolingInfra": { "impact": "Low", "description": "Development tools and debuggers need to support the new CLZ opcode, but this is a straightforward addition." },
-      "layer2s": { "impact": "Medium", "description": "More efficient mathematical operations benefit ZK-proof generation and verification systems, reducing proving costs especially for RISC-V based proving systems." },
-      "stakersNodes": { "impact": "Low", "description": "More efficient computation reduces overall network computational load for mathematical operations." },
-      "clClients": { "impact": "None", "description": "No direct impact on consensus layer operations as this affects execution layer computational capabilities." },
-      "elClients": { "impact": "Low", "description": "Simple implementation - just need to add the CLZ opcode (0x1e) with proper gas accounting. Benchmarked to have similar computational cost to ADD." }
+      "endUsers": {
+        "impact": "Low",
+        "description": "Indirect benefits through lower gas costs for applications using mathematical operations, compression algorithms, and advanced cryptographic schemes."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Can implement much more efficient mathematical algorithms, compression schemes, and bitmap operations. Particularly beneficial for DeFi protocols requiring complex mathematical operations and ZK-proving applications."
+      },
+      "walletDevs": {
+        "impact": "Low",
+        "description": "Minimal direct impact, though benefits indirectly from more efficient mathematical operations in smart contracts."
+      },
+      "toolingInfra": {
+        "impact": "Low",
+        "description": "Development tools and debuggers need to support the new CLZ opcode, but this is a straightforward addition."
+      },
+      "layer2s": {
+        "impact": "Medium",
+        "description": "More efficient mathematical operations benefit ZK-proof generation and verification systems, reducing proving costs especially for RISC-V based proving systems."
+      },
+      "stakersNodes": {
+        "impact": "Low",
+        "description": "More efficient computation reduces overall network computational load for mathematical operations."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No direct impact on consensus layer operations as this affects execution layer computational capabilities."
+      },
+      "elClients": {
+        "impact": "Low",
+        "description": "Simple implementation - just need to add the CLZ opcode (0x1e) with proper gas accounting. Benchmarked to have similar computational cost to ADD."
+      }
     },
     "benefits": [
       "Dramatically reduces gas costs for bit manipulation operations",
@@ -1469,6 +3052,84 @@
       }
     ],
     "laymanDescription": "This adds three new EVM instructions (DUPN, SWAPN, and EXCHANGE) that allow smart contracts to access and manipulate stack items beyond the current 16-item limit, reaching up to 256 items deep. Currently, the EVM stack can hold 1024 items but only the top 16 are easily accessible. These new instructions help compilers write more efficient code for complex functions with many variables by providing better stack management capabilities. The feature only works with the new EOF bytecode format, not legacy contracts."
+  },
+  {
+    "id": 3074,
+    "title": "EIP-3074: AUTH and AUTHCALL opcodes",
+    "status": "Review",
+    "description": "Adds AUTH and AUTHCALL opcodes to enable EOAs to delegate control to contracts for transaction execution.",
+    "author": "Sam Wilson (@SamWilsn), Ansgar Dietrichs (@adietrichs), Matt Garnett (@lightclient), Micah Zoltu (@micahzoltu)",
+    "type": "Standards Track",
+    "category": "Core",
+    "createdDate": "2020-10-01",
+    "discussionLink": "https://ethereum-magicians.org/t/eip-3074-auth-and-authcall-opcodes/4880",
+    "laymanDescription": "This proposal would have allowed regular Ethereum accounts (EOAs) to delegate control to smart contracts using new AUTH and AUTHCALL instructions. It was designed to enable features like transaction batching and gas sponsorship without converting EOAs to smart contracts. However, it was declined for Pectra due to security concerns - particularly the risk of users permanently losing control of their accounts if they signed a malicious authorization. It was replaced by EIP-7702, which provides similar benefits with a safer, temporary delegation model.",
+    "northStars": [
+      "improveUX"
+    ],
+    "northStarAlignment": {
+      "improveUX": {
+        "impact": "High",
+        "description": "Would have enabled account abstraction features like batching and gas sponsorship, but with significant security risks."
+      }
+    },
+    "stakeholderImpacts": {
+      "endUsers": {
+        "impact": "High",
+        "description": "Users would gain powerful features but face severe security risks if they signed malicious authorizations."
+      },
+      "appDevs": {
+        "impact": "High",
+        "description": "Developers could build sophisticated account abstraction features but would bear responsibility for security."
+      },
+      "walletDevs": {
+        "impact": "High",
+        "description": "Wallets would need major updates to safely handle AUTH operations and protect users from malicious invokers."
+      },
+      "toolingInfra": {
+        "impact": "High",
+        "description": "Security tools would need to analyze and warn about dangerous AUTH patterns."
+      },
+      "layer2s": {
+        "impact": "Low",
+        "description": "Some benefits for L2 account models but not a primary use case."
+      },
+      "stakersNodes": {
+        "impact": "None",
+        "description": "No impact on staking operations."
+      },
+      "clClients": {
+        "impact": "None",
+        "description": "No changes required for consensus clients."
+      },
+      "elClients": {
+        "impact": "High",
+        "description": "Would require implementing new opcodes with complex security considerations."
+      }
+    },
+    "benefits": [
+      "Enables transaction batching for EOAs",
+      "Allows gas sponsorship and meta-transactions",
+      "No need to deploy smart contract wallets",
+      "Backwards compatible with existing EOAs",
+      "Lower gas costs than smart contract wallets"
+    ],
+    "tradeoffs": [
+      "Permanent delegation risks - signing the wrong message could lose account forever",
+      "Complex security model that's hard for users to understand",
+      "Invoker contracts could become attack vectors",
+      "No way to revoke authorizations once signed",
+      "Difficult to audit which contracts have authorization"
+    ],
+    "declinedReason": "EIP-3074 was declined for Pectra due to critical security concerns. The permanent nature of AUTH delegations meant users could irreversibly lose control of their accounts by signing a malicious authorization. The community consensus was that the security risks outweighed the UX benefits. It was replaced by EIP-7702, which achieves similar goals through temporary code setting that automatically expires, providing a much safer approach to account abstraction.",
+    "forkRelationships": [
+      {
+        "forkName": "Pectra",
+        "status": "Declined",
+        "isHeadliner": true,
+        "headlinerReplacement": "EIP-7702"
+      }
+    ]
   },
   {
     "id": 3540,
@@ -1920,4 +3581,4 @@
     ],
     "laymanDescription": "This adds practical stack manipulation tools to the EVM without requiring the complex EOF format. It extends the existing SWAP and DUP instructions to reach deeper stack positions (up to 24 positions), adds dynamic SWAPN and DUPN instructions for variable depth access, and introduces an EXCHANGE instruction that can swap any two arbitrary stack positions. These tools help compilers generate more efficient code when dealing with complex functions that have many local variables, reducing gas costs and bytecode size. Unlike previous attempts that required new code formats, this proposal works with existing legacy contracts by requiring specific PUSH instructions before the dynamic operations, making it a pragmatic solution that provides better stack access without breaking backward compatibility."
   }
-] 
+]

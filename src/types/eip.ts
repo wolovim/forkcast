@@ -12,7 +12,7 @@ export interface EIP {
   description: string;
   author: string;
   type: string;
-  category?: string;
+  category?: string | null;
   createdDate: string;
   discussionLink: string;
   forkRelationships: ForkRelationship[];

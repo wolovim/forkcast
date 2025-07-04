@@ -135,7 +135,7 @@ const PublicNetworkUpgradePage: React.FC<PublicNetworkUpgradePageProps> = ({
     ] : []),
     // For non-Glamsterdam forks, show all EIP sections
     ...(forkName.toLowerCase() !== 'glamsterdam' ? [
-      ...['Scheduled for Inclusion', 'Considered for Inclusion', 'Proposed for Inclusion', 'Declined for Inclusion']
+      ...['Included', 'Scheduled for Inclusion', 'Considered for Inclusion', 'Proposed for Inclusion', 'Declined for Inclusion']
         .flatMap(stage => {
           // For Glamsterdam, exclude headliners from "Proposed for Inclusion" since they have their own section
           const stageEips = eips.filter(eip => {
@@ -302,6 +302,7 @@ const PublicNetworkUpgradePage: React.FC<PublicNetworkUpgradePageProps> = ({
               <OverviewSection 
                 eips={eips}
                 forkName={forkName}
+                status={status}
                 onStageClick={scrollToSection}
               />
 
@@ -527,6 +528,7 @@ const PublicNetworkUpgradePage: React.FC<PublicNetworkUpgradePageProps> = ({
 
               {/* EIPs Grouped by Stage */}
               {[
+                { stage: 'Included', description: 'EIPs that have been successfully implemented and are live in this network upgrade.' },
                 { stage: 'Scheduled for Inclusion', description: 'EIPs that client teams have agreed to implement in the next upgrade devnet. These are very likely to be included in the final upgrade.' },
                 { stage: 'Considered for Inclusion', description: 'EIPs that client teams are positive towards. Implementation may begin, but inclusion is not yet guaranteed.' },
                 { stage: 'Proposed for Inclusion', description: 'EIPs that have been proposed for this upgrade but are still under initial review by client teams.' },
